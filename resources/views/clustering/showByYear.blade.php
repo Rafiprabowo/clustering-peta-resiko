@@ -37,6 +37,7 @@
                                                         <i class="fas fa-project-diagram"></i>
                                                     </a>
                                                 </td>
+
                                             </tr>
                                         @empty
                                             <div class="alert alert-danger">
@@ -45,6 +46,7 @@
                                         @endforelse
                                     </tbody>
                                 </table>
+                                {{ $clusteringRuns->links('pagination::bootstrap-4') }}
                             </div>
                         </div>
                     </div>

@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('peta_cleaneds', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('id_peta_awal');
+            $table->unsignedBigInteger('id_clustering_run');
             $table->string('idUsulan')->nullable();
             $table->string('iku')->nullable();
             $table->text('nmKegiatan')->nullable();
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->string('probaBilitas')->nullable();
             $table->timestamps();
 
-            $table->foreign('id_peta_awal')->references('id')->on('peta_awals')->onDelete('cascade');
+            $table->foreign('id_clustering_run')->references('id')->on('clustering_runs')->onDelete('cascade');
         });
     }
 

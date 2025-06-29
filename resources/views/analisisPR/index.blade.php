@@ -12,18 +12,22 @@
                     <div class="col-md-6">
                         <form action="{{ url('/analisis/petas/') }}" method="GET">
                             <div class="input-group mb-2">
-                                <select id="selectYear" name="year" class="form-control" onchange="this.form.submit()">
-                                    <option value="">Semua Tahun</option>
+                                <select id="selectYear" name="tahun" class="form-control mr-2">
+                                    <option value="">Pilih Tahun</option>
                                     @foreach ($years as $year)
-                                        <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected' : '' }}>
+                                        <option value="{{ $year }}" {{ $year == $selectedYear ? 'selected': '' }}>
                                             {{ $year }}
                                         </option>
                                     @endforeach
                                 </select>
 
-                                {{-- <div class="input-group-append ml-2">
+                                {{-- <select id="selectFile" name="file" class="form-control">
+
+                                </select> --}}
+
+                                <div class="input-group-append ml-2">
                                     <button type="submit" class="btn btn-primary">Filter</button>
-                                </div> --}}
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -45,19 +49,10 @@
                                                 class="btn btn-outline-primary mb-1">
                                                 <i class="fas fa-magnifying-glass-plus"></i> Buat Prediksi
                                             </a>
-                                            <a href="{{ route('clustering.index') }}" class="btn btn-primary mb-1">
+                                            <a href="{{ route('clustering.index', ['tahun' => $selectedYear]) }}" class="btn btn-primary mb-1">
                                                 <i class="fas fa-chart-simple"></i> Clustering
                                             </a>
                                         @endif
-
-                                        <a href="{{ route('detailCluster') }}" class="btn btn-outline-success mb-1">Detail
-                                            Cluster</a>
-
-                                        <a href="{{ url('/analisis/petas/heatmap') }}"
-                                            class="btn btn-md btn-primary mb-1">Heatmap Clusters</a>
-
-                                        <a href="{{ route('pieChart') }}" class="btn btn-success mb-1">Visualisasi
-                                            Clusters</a>
 
                                     </div>
                                 </div>
@@ -66,55 +61,41 @@
                                         <tr class="text-center">
                                             <th>No</th>
                                             <th>Unit Kerja</th>
-                                            @foreach ($interpretasiClusters as $cluster => $row)
-                                                <th>
-                                                    Cluster {{ $cluster }}<br>
-                                                    <small class="text-muted">{{ $row->interpretasi }}</small>
-                                                </th>
-                                            @endforeach
                                             <th>Total</th>
                                             <th>Tahun</th>
+                                            <th>File Excel</th>
                                             <th>Detail</th>
-                                            <th>Grafik Cluster</th>
                                         </tr>
                                     </thead>
                                     <tbody>
 
-                                        @forelse ($clusteredByUnitPaginated as $unit)
-                                            <tr class="text-center">
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td class="text-left">{{ $unit['unit'] }}</td>
-                                                @foreach ($interpretasiClusters as $cluster => $row)
-                                                    @php
-                                                        $info = $unit['clusters'][$cluster] ?? [
-                                                            'label' => '-',
-                                                            'jumlah' => 0,
-                                                        ];
-                                                    @endphp
-                                                    <td>
-                                                        {{ $info['jumlah'] }}<br>
-                                                    </td>
-                                                @endforeach
-
-                                                <td>{{ $unit['total'] }}</td>
-                                                <td>{{ $selectedYear }}</td>
-                                                <td>
-                                                    <a href="{{ route('analisisPr.detailUnitKerja', ['unit' => $unit['unit'], 'tahun' => $selectedYear]) }}"
-                                                        class="btn btn-success mb-1">Lihat Detail</a>
-
-                                                </td>
-                                                <td>
-                                                    <a href="" class="btn btn-primary mb-1">Lihat Grafik</a>
+                                        @forelse ($jenisCount as $item)
+                                            <tr>
+                                                  <td class="text-center">{{ $loop->iteration + ($jenisCount->currentPage() - 1) * $jenisCount->perPage() }}</td>
+                                                <td>{{ $item->nmUnit }}</td>
+                                                <td class="text-center">{{ $item->total }}</td>
+                                                <td class="text-center">{{ $item->tahun }}</td>
+                                                <td class="text-center">{{ $item->nama_file }}</td>
+                                                <td class="text-center">
+                                                    <a href="{{ route('analisisPr.detailAnalisisPetaUnitKerja',
+                                                    ['unit' => urlencode($item->nmUnit),
+                                                    'tahun' => $item->tahun,
+                                                    'file' => urlencode($item->nama_file)
+                                                    ]) }}"
+                                                    class="btn btn-success">Lihat Detail</a>
                                                 </td>
                                             </tr>
                                         @empty
+                                            <div class="alert alert-danger">
+                                                Data Analisis Peta Risiko belum Tersedia
+                                            </div>
                                         @endforelse
 
                                     </tbody>
 
                                 </table>
                                 <div class="d-flex justify-content-start">
-                                    {{ $clusteredByUnitPaginated->links('pagination::bootstrap-4') }}
+                                    {{ $jenisCount->links('pagination::bootstrap-4') }}
                                 </div>
                             </div>
                         </div>
@@ -125,30 +106,37 @@
     </div>
 
 @endsection
-
-
-
 {{-- @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function(){
-        const yearSelect = document.querySelector('[name="year"]')
-        const fileSelect = document.querySelector('[name="file"]')
+    <script>
+        $('#selectYear').change(function() {
+            let year = $(this).val();
 
-        yearSelect.addEventListener('change', function(){
-            const year = this.value;
+            // Kosongkan select file saat tahun berubah
+            $('#selectFile').html('<option value="">Loading...</option>');
 
-            fetch(`/get-files-by-year?year=${year}`)
-                .then(res => res.json())
-                .then(files =>{
-                    fileSelect.innerHTML = '<option value="">-- Pilih File --</option>';
-                    files.forEach(file => {
-                        const option = document.createElement('option');
-                        option.value = file
-                        option.textContent = file;
-                        fileSelect.appendChild(option);
-                    });
-                })
-        })
-    })
-</script>
+            // Lakukan request
+            $.ajax({
+                url: '{{ url('/analisis/petas/get-files-by-year') }}', // Buat route ini nanti
+                type: 'GET',
+                data: {
+                    year: year
+                },
+                success: function(data) {
+                    console.log(data)
+                    let options = '<option value="">Pilih File</option>';
+                    if (data.length > 0) {
+                        data.forEach(function(file) {
+                            options += `<option value="${file.id}">${file.nama_file}</option>`;
+                        });
+                    } else {
+                        options = '<option value="">Tidak ada file</option>';
+                    }
+                    $('#selectFile').html(options);
+                },
+                error: function() {
+                    $('#selectFile').html('<option value="">Gagal memuat data</option>');
+                }
+            });
+        });
+    </script>
 @endpush --}}

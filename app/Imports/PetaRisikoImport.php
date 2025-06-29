@@ -41,12 +41,12 @@ class PetaRisikoImport implements ToCollection, WithHeadingRow
         if (empty($serial)) {
             return null;
         }
-        
+
         // Excel menggunakan sistem 1900 date system
         // dimana 1 = 1/1/1900
         // Perlu dikurangi 2 karena Excel menganggap 1900 adalah tahun kabisat
         $unix_date = ($serial - 25569) * 86400;
-        
+
         // Konversi ke format MySQL date (Y-m-d)
         return date('Y-m-d', $unix_date);
     }
@@ -123,13 +123,29 @@ class PetaRisikoImport implements ToCollection, WithHeadingRow
                 'waktu_telaah_spi' => $this->convertExcelDate($row['waktutelaahspi'] ?? ''),
             ];
 
-            if ($existing) {
-                $existing->update($data);
-                $updated++;
-                $messages[] = "Data dengan judul '{$row['nmkegiatan']}' berhasil diupdate.";
-            } else {
-                Peta::create($data);
-                $imported++;
+            // if ($existing) {
+            //     $existing->update($data);
+            //     $updated++;
+            //     $messages[] = "Data dengan judul '{$row['nmkegiatan']}' berhasil diupdate.";
+            // } else {
+            //     Peta::create($data);
+            //     $imported++;
+            // }
+
+            try {
+                if ($existing) {
+                    $existing->update($data);
+                    $updated++;
+                    $messages[] = "Data dengan judul '{$row['nmkegiatan']}' berhasil diupdate.";
+                } else {
+                    Peta::create($data);
+                    $imported++;
+                }
+            } catch (\Exception $e) {
+                $errors[] = "Gagal menyimpan data kegiatan '{$row['nmkegiatan']}': " . $e->getMessage();
+
+                // Debug langsung saat development (bisa diaktifkan kalau perlu)
+                dd($data, $e->getMessage());
             }
         }
 

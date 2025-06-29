@@ -1,50 +1,56 @@
 @extends('layout.app')
-@section('title', 'Preprocessing Data Peta Risiko')
+@section('title', 'Hasil Analisis Peta Risiko')
 @section('main')
     <div class="main-content">
         <section class="section">
             <div class="section-header d-flex align-items-center">
-                <a href="{{ url()->previous() }}" class="mr-3"><i class="fas fa-arrow-left" style="font-size: 1.3rem"></i></a>
-                <h1>Preprocessing Data Peta Risiko</h1>
+                <a href="{{ url()->previous() }}" class="mr-3">
+                    <i class="fas fa-arrow-left" style="font-size: 1.3rem"></i>
+                </a>
+                <h1>Hasil Analisis Peta Risiko {{ $unit }}</h1>
             </div>
             <div class="section-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <div class="card">
+                        <div class="card border-0 shadow rounded">
                             <div class="card-body">
                                 <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
+                                    <thead class="thead-light">
+                                        <tr class="text-center">
                                             <th>No</th>
-                                            <th>Unit Kerja</th>
-                                            <th>Usulan Kegiatan</th>
+                                            <th>Judul</th>
+                                            <th>Cluster</th>
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse ($petaCleaneds as $index => $peta)
+                                        @forelse ($analisisPetas as $index => $item)
                                             <tr>
-                                                <td>{{ ($petaCleaneds->currentPage() - 1) * $petaCleaneds->perPage() + $index + 1 }}
+                                                <td class="text-center">{{ ($analisisPetas->currentPage() - 1) * $analisisPetas->perPage() + $index + 1 }}
                                                 </td>
-                                                <td>{{ $peta->nmUnit }}</td>
-                                                <td>{{ $peta->nmKegiatan }}</td>
+                                                <td>{{ $item->nmKegiatan }}</td>
+                                                <td>
+                                                    {{ $item->cluster->cluster ?? '-' }}
+                                                    ({{ $item->cluster && $item->cluster->interpretasi ? $item->cluster->interpretasi->interpretasi : '-' }})
+                                                </td>
+
                                                 <td class="text-center">
-                                                    <a href=""
+                                                    <a href="{{ route('analisisPr.detailPR', ['id' => $item->id]) }}"
                                                         class="btn fa-solid fa-list bg-success p-2 text-white"
                                                         data-toggle="tooltip" title="Detail Dokumen"></a>
                                                 </td>
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="4" class="text-center">Data kosong</td>
+                                                <td colspan="4" class="text-center">Tidak ada data tersedia</td>
                                             </tr>
                                         @endforelse
                                     </tbody>
                                 </table>
-                                {{ $petaCleaneds->links('pagination::bootstrap-4') }}
+
+                                {{ $analisisPetas->links('pagination::bootstrap-4') }}
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>

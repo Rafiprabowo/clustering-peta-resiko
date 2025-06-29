@@ -23,12 +23,36 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use App\Imports\PetaRisikoImport;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Throwable;
 
-
+use function PHPSTORM_META\map;
 
 class PetaController extends Controller
 {
+      private function calculateRiskLevel($probability, $impact)
+    {
+        $probability = (int)substr($probability, 0, 1);
+        $impact = (int)substr($impact, 0, 1);
+        $score = $probability * $impact;
+
+        if ($score >= 21) {
+            return "EXTREME";
+        } elseif ($score >= 16) {
+            return "HIGH";
+        } elseif ($score >= 11) {
+            return "MIDDLE";
+        } elseif ($score >= 6) {
+            return "LOW";
+        } else {
+            return "VERY LOW";
+        }
+    }
+
+
     public function index(Request $request, TugasLaporChart $tugasLaporChart)
     {
         $active = 7;
@@ -44,14 +68,14 @@ class PetaController extends Controller
 
         //     // Mengambil data jenis yang dikelompokkan berdasarkan jenis untuk admin
         //     $jenisCount = Peta::select(
-        //         'jenis', 
+        //         'jenis',
         //         DB::raw('count(*) as total'),
-        //         DB::raw("(SELECT anggota 
-        //                  FROM petas p2 
-        //                  WHERE p2.jenis = petas.jenis 
-        //                     AND p2.anggota IS NOT NULL 
+        //         DB::raw("(SELECT anggota
+        //                  FROM petas p2
+        //                  WHERE p2.jenis = petas.jenis
+        //                     AND p2.anggota IS NOT NULL
         //                     AND TRIM(p2.anggota) != ''
-        //                  ORDER BY p2.created_at ASC 
+        //                  ORDER BY p2.created_at ASC
         //                  LIMIT 1) as anggota"
         //         )
         //     )
@@ -73,12 +97,12 @@ class PetaController extends Controller
         //         'petas.jenis',
         //         DB::raw('count(*) as filtered_total'), // Total yang memenuhi filter
         //         DB::raw('(SELECT COUNT(*) FROM petas as p2 WHERE p2.jenis = petas.jenis) as total'), // Total semua peta per jenis
-        //         DB::raw("(SELECT anggota 
-        //                  FROM petas p2 
-        //                  WHERE p2.jenis = petas.jenis 
-        //                     AND p2.anggota IS NOT NULL 
+        //         DB::raw("(SELECT anggota
+        //                  FROM petas p2
+        //                  WHERE p2.jenis = petas.jenis
+        //                     AND p2.anggota IS NOT NULL
         //                     AND TRIM(p2.anggota) != ''
-        //                  ORDER BY p2.created_at ASC 
+        //                  ORDER BY p2.created_at ASC
         //                  LIMIT 1) as anggota"
         //         )
         //     )
@@ -103,17 +127,17 @@ class PetaController extends Controller
             $jenisCount = Peta::select(
                 'jenis',
                 DB::raw('count(*) as total'),
-                DB::raw("(SELECT anggota 
-                     FROM petas p2 
-                     WHERE p2.jenis = petas.jenis 
-                        AND p2.anggota IS NOT NULL 
+                DB::raw("(SELECT anggota
+                     FROM petas p2
+                     WHERE p2.jenis = petas.jenis
+                        AND p2.anggota IS NOT NULL
                         AND TRIM(p2.anggota) != ''
-                     ORDER BY p2.created_at ASC 
+                     ORDER BY p2.created_at ASC
                      LIMIT 1) as anggota"),
                 DB::raw(
-                    "(SELECT penelaah_peta 
-                     FROM unit_kerjas 
-                     WHERE nama_unit_kerja = petas.jenis 
+                    "(SELECT penelaah_peta
+                     FROM unit_kerjas
+                     WHERE nama_unit_kerja = petas.jenis
                      LIMIT 1) as penelaah"
                 ),
                 DB::raw(
@@ -137,17 +161,17 @@ class PetaController extends Controller
                 'petas.jenis',
                 DB::raw('count(*) as filtered_total'),
                 DB::raw('(SELECT COUNT(*) FROM petas as p2 WHERE p2.jenis = petas.jenis) as total'),
-                DB::raw("(SELECT anggota 
-                     FROM petas p2 
-                     WHERE p2.jenis = petas.jenis 
-                        AND p2.anggota IS NOT NULL 
+                DB::raw("(SELECT anggota
+                     FROM petas p2
+                     WHERE p2.jenis = petas.jenis
+                        AND p2.anggota IS NOT NULL
                         AND TRIM(p2.anggota) != ''
-                     ORDER BY p2.created_at ASC 
+                     ORDER BY p2.created_at ASC
                      LIMIT 1) as anggota"),
                 DB::raw(
-                    "(SELECT penelaah_peta 
-                     FROM unit_kerjas 
-                     WHERE nama_unit_kerja = petas.jenis 
+                    "(SELECT penelaah_peta
+                     FROM unit_kerjas
+                     WHERE nama_unit_kerja = petas.jenis
                      LIMIT 1) as penelaah"
                 ),
                 DB::raw(
@@ -250,17 +274,17 @@ class PetaController extends Controller
     //         $jenisCount = Peta::select(
     //             'jenis',
     //             DB::raw('count(*) as total'),
-    //             DB::raw("(SELECT anggota 
-    //                  FROM petas p2 
-    //                  WHERE p2.jenis = petas.jenis 
-    //                     AND p2.anggota IS NOT NULL 
+    //             DB::raw("(SELECT anggota
+    //                  FROM petas p2
+    //                  WHERE p2.jenis = petas.jenis
+    //                     AND p2.anggota IS NOT NULL
     //                     AND TRIM(p2.anggota) != ''
-    //                  ORDER BY p2.created_at ASC 
+    //                  ORDER BY p2.created_at ASC
     //                  LIMIT 1) as anggota"),
     //             DB::raw(
-    //                 "(SELECT penelaah_peta 
-    //                  FROM unit_kerjas 
-    //                  WHERE nama_unit_kerja = petas.jenis 
+    //                 "(SELECT penelaah_peta
+    //                  FROM unit_kerjas
+    //                  WHERE nama_unit_kerja = petas.jenis
     //                  LIMIT 1) as penelaah"
     //             )
     //         )
@@ -281,17 +305,17 @@ class PetaController extends Controller
     //             'petas.jenis',
     //             DB::raw('count(*) as filtered_total'),
     //             DB::raw('(SELECT COUNT(*) FROM petas as p2 WHERE p2.jenis = petas.jenis) as total'),
-    //             DB::raw("(SELECT anggota 
-    //                  FROM petas p2 
-    //                  WHERE p2.jenis = petas.jenis 
-    //                     AND p2.anggota IS NOT NULL 
+    //             DB::raw("(SELECT anggota
+    //                  FROM petas p2
+    //                  WHERE p2.jenis = petas.jenis
+    //                     AND p2.anggota IS NOT NULL
     //                     AND TRIM(p2.anggota) != ''
-    //                  ORDER BY p2.created_at ASC 
+    //                  ORDER BY p2.created_at ASC
     //                  LIMIT 1) as anggota"),
     //             DB::raw(
-    //                 "(SELECT penelaah_peta 
-    //                  FROM unit_kerjas 
-    //                  WHERE nama_unit_kerja = petas.jenis 
+    //                 "(SELECT penelaah_peta
+    //                  FROM unit_kerjas
+    //                  WHERE nama_unit_kerja = petas.jenis
     //                  LIMIT 1) as penelaah"
     //             )
     //         )
@@ -527,17 +551,17 @@ class PetaController extends Controller
         $jenisCount = Peta::select(
             'jenis',
             DB::raw('count(*) as total'),
-            DB::raw("(SELECT anggota 
-                 FROM petas p2 
-                 WHERE p2.jenis = petas.jenis 
-                    AND p2.anggota IS NOT NULL 
+            DB::raw("(SELECT anggota
+                 FROM petas p2
+                 WHERE p2.jenis = petas.jenis
+                    AND p2.anggota IS NOT NULL
                     AND TRIM(p2.anggota) != ''
-                 ORDER BY p2.created_at ASC 
+                 ORDER BY p2.created_at ASC
                  LIMIT 1) as anggota"),
             DB::raw(
-                "(SELECT penelaah_peta 
-                 FROM unit_kerjas 
-                 WHERE nama_unit_kerja = petas.jenis 
+                "(SELECT penelaah_peta
+                 FROM unit_kerjas
+                 WHERE nama_unit_kerja = petas.jenis
                  LIMIT 1) as penelaah"
             )
         )
@@ -1683,7 +1707,7 @@ class PetaController extends Controller
         $request->validate([
             'file' => 'required|mimes:xlsx,xls'
         ]);
-        // dd($request->all());/
+        // dd($request->all());
 
         try {
             // Ambil file dari request
@@ -1695,6 +1719,7 @@ class PetaController extends Controller
 
             // Import data dan hitung jumlah baris
             Excel::import(new PetaRisikoImport, $file);
+
 
             // Hitung jumlah baris dalam file Excel
             $spreadsheet = IOFactory::load($file->getPathname());
@@ -1757,4 +1782,543 @@ class PetaController extends Controller
         //     ->with('success', 'Penelaah Peta berhasil diupdate.');
         return redirect()->back();
     }
+
+    public function identifikasiRisiko($tahun){
+        $active = 7;
+
+        $jenis = Peta::select('jenis')
+            ->whereYear('created_at', $tahun)
+            ->orderBy('jenis')
+            ->distinct()
+            ->pluck('jenis');
+
+        return view('pr.identifikasiRisiko', compact('active', 'jenis', 'tahun'));
+    }
+
+
+
+public function exportPdfIdentifikasiRisiko($jenis, $tahun)
+{
+    // Ambil data dari database
+    $data = Peta::where('jenis', $jenis)
+        ->whereYear('created_at', $tahun)
+        ->get();
+
+
+
+    // Transformasi data untuk ditampilkan
+    $selectedAtr = $data->map(function($item) {
+        $skor_dampak = $item->skor_dampak;
+        $skor_kemungkinan = $item->skor_kemungkinan;
+        $tingkatRisiko = $this->calculateRiskLevel($skor_kemungkinan, $skor_dampak);
+
+        return [
+            'kodeRegister' => $item->kode_regist,
+            'namaUnit' => $item->jenis,
+            'usulanKegiatan' => $item->judul,
+            'nilUsulan' => $item->anggaran,
+            'skorProbabilitas' => $skor_kemungkinan,
+            'skorDampak' => $skor_dampak,
+            'tingkatRisiko' => $tingkatRisiko,
+            'uraianDampak' => $item->uraian,
+            'pernyataanRisiko' => $item->pernyataan,
+            'pengendalian' => $item->metode,
+            'SPIP' => $item->spip ?? ''
+        ];
+    });
+
+    // Hitung total kategori risiko
+    $riskCounts = [
+        'Sangat Tinggi' => 0,
+        'Tinggi' => 0,
+        'Sedang' => 0,
+        'Rendah' => 0,
+        'Sangat Rendah' => 0,
+    ];
+
+    foreach ($selectedAtr as $item) {
+        $level = strtolower($item['tingkatRisiko']);
+        switch ($level) {
+            case 'extreme':
+                $riskCounts['Sangat Tinggi']++; break;
+            case 'high':
+                $riskCounts['Tinggi']++; break;
+            case 'middle':
+                $riskCounts['Sedang']++; break;
+            case 'low':
+                $riskCounts['Rendah']++; break;
+            case 'very low':
+                $riskCounts['Sangat Rendah']++; break;
+        }
+    }
+
+    // Hitung total dan buat label dengan persentase
+    $total = array_sum($riskCounts);
+    $colors = ['#c00000', '#ffc000', '#ffff00', '#00b050', '#00b0f0'];
+
+    $labels = [];
+    foreach ($riskCounts as $label => $count) {
+        if ($count > 0) {
+            $percentage = round(($count / $total) * 100);
+            $labels[] = "$label ($count / {$percentage}%)";
+        } else {
+            $labels[] = ''; // jika kosong, label dikosongkan
+        }
+    }
+
+    $chartConfig = [
+        'type' => 'doughnut',
+        'data' => [
+            // 'labels' => array_keys($riskCounts),
+            'datasets' => [[
+                'data' => array_values($riskCounts),
+                'backgroundColor' => $colors,
+                'borderColor' => '#000000',
+                'borderWidth' => 2
+            ]]
+        ],
+        'options' => [
+            'plugins' => [
+                'datalabels' => [
+                    'color' => '#000000',
+                    'font' => ['weight' => 'bold', 'size' => 16],
+                    'align' => 'center',
+                    'formatter' => "function(value, context) {
+                        const sum = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                        const percent = (value / sum * 100).toFixed(0);
+                        return value + '\\n' + percent + '%';
+                    }"
+                ],
+                'title' => [
+                    'display' => true,
+                    'text' => 'PROFIL RISIKO',
+                    'font' => ['size' => 16]
+                ]
+            ],
+            'cutout' => '55%',
+            'layout' => ['padding' => 10]
+        ],
+        'plugins' => ['datalabels']
+    ];
+
+
+    // Generate URL QuickChart
+    $chartUrl = 'https://quickchart.io/chart?c=' . urlencode(json_encode($chartConfig, JSON_UNESCAPED_SLASHES));
+
+
+    // dd($chartUrl);
+
+    // Kirim ke view PDF
+    return Pdf::loadView('pdf.export-unit-kerja', [
+        'data' => $selectedAtr,
+        'jenis' => $jenis,
+        'tahun' => $tahun,
+        'chartUrl' => $chartUrl,
+        'riskCounts' => $riskCounts,
+        'colors' => $colors,
+    ])->setPaper('a4', 'landscape')->setOptions([
+        'isHtml5ParserEnabled' => true,
+        'isRemoteEnabled' => true,
+    ])->stream("Peta Risiko $jenis-$tahun.pdf");
+}
+
+
+
+
+
+
+public function exportExcelUnitKerja(Request $request, $jenis, $tahun)
+{
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Judul Utama
+    $sheet->mergeCells('A1:J1');
+    $sheet->setCellValue('A1', 'IDENTIFIKASI DAN ANALISIS RISIKO');
+    $sheet->getStyle('A1')->applyFromArray([
+        'font' => ['bold' => true, 'size' => 14],
+        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        'fill' => [
+            'fillType' => Fill::FILL_SOLID,
+            'startColor' => ['rgb' => 'd8e4bc']
+        ]
+    ]);
+
+    // Baris info unit & tahun
+    $sheet->setCellValue('A2', 'Nama Unit Pemilik Risiko');
+    $sheet->setCellValue('B2', $jenis);
+    $sheet->setCellValue('A3', 'Tahun');
+    $sheet->setCellValue('B3', $tahun);
+
+    // Header tabel
+    $headers = [
+        'Nama Unit & Kode', 'Usulan Kegiatan', 'Nilai Usulan',
+        'Skor Probabilitas', 'Skor Dampak', 'Tingkat Risiko',
+        'SPIP', 'Uraian Dampak', 'Pernyataan Risiko', 'Pengendalian'
+    ];
+
+    $startRow = 5;
+    $col = 'A';
+
+    // Baris 5: Header kolom
+    foreach ($headers as $header) {
+        $sheet->setCellValue($col . $startRow, $header);
+        $sheet->getStyle($col . $startRow)->applyFromArray([
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'wrapText' => true],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'c5d9f1']
+            ],
+            'borders' => [
+                'allBorders' => ['borderStyle' => Border::BORDER_THIN],
+            ],
+        ]);
+        $sheet->getColumnDimension($col)->setWidth(20);
+        $col++;
+    }
+
+    // Baris 6: Nomor urut kolom (1 - 10)
+    $col = 'A';
+for ($i = 1; $i <= count($headers); $i++) {
+    $sheet->setCellValue($col . ($startRow + 1), $i);
+    $sheet->getStyle($col . ($startRow + 1))->applyFromArray([
+        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        'fill' => [
+            'fillType' => Fill::FILL_SOLID,
+            'startColor' => ['rgb' => 'e3ebf9'],
+        ],
+        'borders' => [
+            'allBorders' => ['borderStyle' => Border::BORDER_THIN],
+        ],
+    ]);
+    $col++;
+}
+
+
+    // Ambil data
+    $data = Peta::where('jenis', $jenis)
+        ->whereYear('created_at', $tahun)
+        ->get();
+
+    $row = $startRow + 2; // Mulai data dari baris ke-7
+    foreach ($data as $i => $d) {
+        $probabilitas = match ($d->skor_kemungkinan) {
+            1 => 'Sangat Jarang',
+            2 => 'Jarang',
+            3 => 'Kadang-kadang',
+            4 => 'Sering',
+            5 => 'Sangat Sering',
+            default => '-',
+        };
+
+        $dampak = match ($d->skor_dampak) {
+            1 => 'Sangat Sedikit Berpengaruh',
+            2 => 'Sedikit Berpengaruh',
+            3 => 'Cukup Berpengaruh',
+            4 => 'Berpengaruh',
+            5 => 'Sangat Berpengaruh',
+            default => '-',
+        };
+
+        $tingkatRisiko = $this->calculateRiskLevel($d->skor_kemungkinan, $d->skor_dampak);
+
+        $sheet->fromArray([
+            $d->jenis . '-' . ($i + 1),
+            $d->judul,
+            $d->anggaran,
+            $d->skor_kemungkinan,
+            $d->skor_dampak,
+            $tingkatRisiko,
+            $d->spip ?? '',
+            $d->uraian,
+            $d->pernyataan,
+            $d->metode,
+        ], null, 'A' . $row);
+
+        $sheet->getStyle("A{$row}:J{$row}")->applyFromArray([
+            'alignment' => ['wrapText' => true, 'vertical' => Alignment::VERTICAL_TOP],
+            'borders' => [
+                'allBorders' => ['borderStyle' => Border::BORDER_THIN],
+            ],
+        ]);
+
+        $riskColor = match (strtolower($tingkatRisiko)) {
+            'very low' => '00b0f0',
+            'low'      => '00b050',
+            'middle'   => 'ffff00',
+            'high'     => 'ffc000',
+            'extreme'  => 'c00000',
+            default    => null,
+        };
+
+        if ($riskColor) {
+            $sheet->getStyle("F{$row}")->applyFromArray([
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => $riskColor],
+                ],
+                'font' => ['bold' => true],
+            ]);
+        }
+
+        $row++;
+    }
+
+    // Simpan dan download
+    $writer = new Xlsx($spreadsheet);
+    $filename = 'Peta_Risiko_' . $jenis . '_' . $tahun . '_' . date('d-m-Y') . '.xlsx';
+    $temp_file = storage_path('app/public/' . $filename);
+    $writer->save($temp_file);
+
+    return response()->download($temp_file, $filename, [
+        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ])->deleteFileAfterSend(true);
+}
+
+
+public function exportExcelAll(Request $request)
+{
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Judul Utama
+    $sheet->mergeCells('A1:J1');
+    $sheet->setCellValue('A1', 'REKAP IDENTIFIKASI DAN ANALISIS RISIKO SELURUH UNIT TAHUN 2025');
+    $sheet->getStyle('A1')->applyFromArray([
+        'font' => ['bold' => true, 'size' => 14],
+        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        'fill' => [
+            'fillType' => Fill::FILL_SOLID,
+            'startColor' => ['rgb' => 'd8e4bc']
+        ]
+    ]);
+
+    // Header kolom
+    $headers = [
+        'Nama Unit & Kode', 'Usulan Kegiatan', 'Nilai Usulan',
+        'Skor Probabilitas', 'Skor Dampak', 'Tingkat Risiko',
+        'SPIP', 'Uraian Dampak', 'Pernyataan Risiko', 'Pengendalian'
+    ];
+
+    $startRow = 3;
+    $col = 'A';
+
+    foreach ($headers as $header) {
+        $sheet->setCellValue($col . $startRow, $header);
+        $sheet->getStyle($col . $startRow)->applyFromArray([
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'wrapText' => true],
+            'fill' => [
+                'fillType' => Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'c5d9f1']
+            ],
+            'borders' => [
+                'allBorders' => ['borderStyle' => Border::BORDER_THIN],
+            ],
+        ]);
+        $sheet->getColumnDimension($col)->setWidth(20);
+        $col++;
+    }
+
+    // Ambil seluruh data
+    $data = Peta::orderBy('jenis')->get();
+    $unitCounters = [];
+
+    $row = $startRow + 1;
+    foreach ($data as $d) {
+        // Hitung counter per unit
+        if (!isset($unitCounters[$d->jenis])) {
+            $unitCounters[$d->jenis] = 1;
+        } else {
+            $unitCounters[$d->jenis]++;
+        }
+
+        $probabilitas = match ($d->skor_kemungkinan) {
+            1 => 'Sangat Jarang',
+            2 => 'Jarang',
+            3 => 'Kadang-kadang',
+            4 => 'Sering',
+            5 => 'Sangat Sering',
+            default => '-',
+        };
+
+        $dampak = match ($d->skor_dampak) {
+            1 => 'Sangat Sedikit Berpengaruh',
+            2 => 'Sedikit Berpengaruh',
+            3 => 'Cukup Berpengaruh',
+            4 => 'Berpengaruh',
+            5 => 'Sangat Berpengaruh',
+            default => '-',
+        };
+
+        $tingkatRisiko = $this->calculateRiskLevel($d->skor_kemungkinan, $d->skor_dampak);
+
+        $sheet->fromArray([
+            $d->jenis . '-' . $unitCounters[$d->jenis],
+            $d->judul,
+            $d->anggaran,
+            $d->skor_kemungkinan,
+            $d->skor_dampak,
+            $tingkatRisiko,
+            $d->spip ?? '',
+            $d->uraian,
+            $d->pernyataan,
+            $d->metode,
+        ], null, 'A' . $row);
+
+        $sheet->getStyle("A{$row}:J{$row}")->applyFromArray([
+            'alignment' => ['wrapText' => true, 'vertical' => Alignment::VERTICAL_TOP],
+            'borders' => [
+                'allBorders' => ['borderStyle' => Border::BORDER_THIN],
+            ],
+        ]);
+
+        $riskColor = match (strtolower($tingkatRisiko)) {
+            'very low' => '00b0f0',
+            'low'      => '00b050',
+            'middle'   => 'ffff00',
+            'high'     => 'ffc000',
+            'extreme'  => 'c00000',
+            default    => null,
+        };
+
+
+
+        if ($riskColor) {
+            $sheet->getStyle("F{$row}")->applyFromArray([
+                'fill' => [
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => $riskColor],
+                ],
+                'font' => ['bold' => true],
+            ]);
+        }
+
+        $row++;
+    }
+
+    $writer = new Xlsx($spreadsheet);
+    $filename = 'Rekap_Peta_Risiko_' . date('d-m-Y') . '.xlsx';
+    $temp_file = storage_path('app/public/' . $filename);
+    $writer->save($temp_file);
+
+    return response()->download($temp_file, $filename, [
+        'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ])->deleteFileAfterSend(true);
+}
+
+public function exportPdfAll()
+{
+
+    ini_set('max_execution_time', 300);
+    $dataPerJenis = Peta::orderBy('jenis')->get()->groupBy('jenis');
+
+    $colors = ['#c00000', '#ffc000', '#ffff00', '#00b050', '#00b0f0'];
+
+    $result = [];
+
+    foreach ($dataPerJenis as $jenis => $items) {
+        $mapped = $items->map(function ($item) {
+            $skor_dampak = $item->skor_dampak;
+            $skor_kemungkinan = $item->skor_kemungkinan;
+            $tingkatRisiko = $this->calculateRiskLevel($skor_kemungkinan, $skor_dampak);
+
+            return [
+                'kodeRegister' => $item->kode_regist,
+                'namaUnit' => $item->jenis,
+                'usulanKegiatan' => $item->judul,
+                'nilUsulan' => $item->anggaran,
+                'skorProbabilitas' => $skor_kemungkinan,
+                'skorDampak' => $skor_dampak,
+                'tingkatRisiko' => $tingkatRisiko,
+                'uraianDampak' => $item->uraian,
+                'pernyataanRisiko' => $item->pernyataan,
+                'pengendalian' => $item->metode,
+                'SPIP' => $item->spip ?? ''
+            ];
+        });
+
+        $riskCounts = [
+            'Sangat Tinggi' => 0,
+            'Tinggi' => 0,
+            'Sedang' => 0,
+            'Rendah' => 0,
+            'Sangat Rendah' => 0,
+        ];
+
+        foreach ($mapped as $item) {
+            switch (strtolower($item['tingkatRisiko'])) {
+                case 'extreme':
+                    $riskCounts['Sangat Tinggi']++; break;
+                case 'high':
+                    $riskCounts['Tinggi']++; break;
+                case 'middle':
+                    $riskCounts['Sedang']++; break;
+                case 'low':
+                    $riskCounts['Rendah']++; break;
+                case 'very low':
+                    $riskCounts['Sangat Rendah']++; break;
+            }
+        }
+
+        $chartConfig = [
+            'type' => 'doughnut',
+            'data' => [
+                'datasets' => [[
+                    'data' => array_values($riskCounts),
+                    'backgroundColor' => $colors,
+                    'borderColor' => '#000000',
+                    'borderWidth' => 2
+                ]]
+            ],
+            'options' => [
+                'plugins' => [
+                    'datalabels' => [
+                        'color' => '#000000',
+                        'font' => ['weight' => 'bold', 'size' => 16],
+                        'align' => 'center',
+                        'formatter' => "function(value, context) {
+                            const sum = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                            const percent = (value / sum * 100).toFixed(0);
+                            return value + '\\n' + percent + '%';
+                        }"
+                    ],
+                    'title' => [
+                        'display' => true,
+                        'text' => 'PROFIL RISIKO ' . $jenis,
+                        'font' => ['size' => 16]
+                    ]
+                ],
+                'cutout' => '55%',
+                'layout' => ['padding' => 10]
+            ],
+            'plugins' => ['datalabels']
+        ];
+
+        $chartUrl = 'https://quickchart.io/chart?c=' . urlencode(json_encode($chartConfig, JSON_UNESCAPED_SLASHES));
+
+        $result[] = [
+            'jenis' => $jenis,
+            'data' => $mapped,
+            'riskCounts' => $riskCounts,
+            'colors' => $colors,
+            'chartUrl' => $chartUrl,
+        ];
+    }
+
+    return Pdf::loadView('pdf.export-semua-unit', [
+        'units' => $result
+    ])->setPaper('a4', 'landscape')->setOptions([
+        'isHtml5ParserEnabled' => true,
+        'isRemoteEnabled' => true
+    ])->stream("Peta_Risiko_Semua_Unit_2025.pdf");
+}
+
+
+
+
+
+
+
 }

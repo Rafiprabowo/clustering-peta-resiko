@@ -26,17 +26,55 @@ class ClusteringController extends Controller
 {
     //
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $active = 6;
-        $clusteringRuns = ClusteringRun::paginate(5);
+        $tahun  = $request->tahun;
+
+        $clusteringRuns = ClusteringRun::when($tahun, function ($q, $tahun){
+                return $q->whereYear('created_at', $tahun);
+            })
+            ->orderBy('created_at', 'desc') // Opsional: biar hasil rapi
+            ->get(); // Jangan lupa eksekusi query!
+
         return view('clustering.index', compact('active', 'clusteringRuns'));
     }
 
-    public function detailById($id){
+
+
+    public function detail($id)
+    {
         $active = 6;
-        $clustering = ClusteringRun::findOrFail($id);
+
+        $clusteringRun = ClusteringRun::findOrFail($id);
+
+        // Ambil peta awal dengan pagination
+        $petaAwals = $clusteringRun->petaAwals()->paginate(5);
+
+        // Ambil peta cleaned + relasi (kalau mau sekalian)
+        $petaCleaneds = $clusteringRun->petaCleaneds()->with(['preprocessing', 'cluster.interpretasi'])->get();
+
+        return view('clustering.detail', compact('active', 'clusteringRun', 'petaAwals', 'petaCleaneds'));
+    }
 
 
+
+
+
+    public function detailPR($id){
+        $active = 6;
+
+        $peta = PetaAwal::findOrFail($id);
+
+        return view('clustering.detailPR', compact('active', 'peta'));
+    }
+
+    public function detailCleanedPR($id){
+        $active = 6;
+
+        $peta = PetaCleaned::findOrFail($id);
+
+        return view('clustering.detailCleanedPR', compact('active', 'peta'));
     }
 
      public function detailTransform($id){
@@ -151,11 +189,17 @@ class ClusteringController extends Controller
                 if($response->successful()){
                     $data = $response->json();
 
-                    //save data mentah
-                    $ids = [];
+                    $clusteringRun = ClusteringRun::create([
+                        'nama_file' => $data['filename'],
+                        'tahun' => now()->year,
+                        'jumlah_cluster' => $data['clustering_run']['jumlah_cluster'],
+                        'silhouette_score' => $data['clustering_run']['silhouette_score']
+                    ]);
+
 
                     foreach($data['peta_awals'] as $row){
                         $petaAwal = PetaAwal::create([
+                            'id_clustering_run' => $clusteringRun->id,
                             'idUsulan' => $row['idUsulan'] ?? '',
                             'iku' => $row['kode_iku'] ?? '',
                             'nmKegiatan' => $row['nmKegiatan'] ?? '',
@@ -168,14 +212,12 @@ class ClusteringController extends Controller
                             'probaBilitas' => $row['probaBilitas'] ?? '',
                             'pengendalian' => $row['pengendalian'] ?? ''
                         ]);
-                        $ids[] = $petaAwal->id;
+
                     }
 
                     foreach($data['peta_cleaneds'] as $row){
-                        $index = $row['index_awal'];
-                        unset($row['index_awal']);
                         PetaCleaned::create([
-                            'id_peta_awal' => $ids[$index],
+                            'id_clustering_run' => $clusteringRun->id,
                             'idUsulan' => $row['idUsulan'] ?? '',
                             'iku' => $row['kode_iku'] ?? '',
                             'nmKegiatan' => $row['nmKegiatan'] ?? '',
@@ -200,12 +242,7 @@ class ClusteringController extends Controller
                         ]);
                     }
 
-                    $clusteringRun = ClusteringRun::create([
-                        'nama_file' => $data['filename'],
-                        'tahun' => $data['clustering_run']['tahun'] ?? now()->year,
-                        'jumlah_cluster' => $data['clustering_run']['jumlah_cluster'],
-                        'silhouette_score' => $data['clustering_run']['silhouette_score']
-                    ]);
+
 
                     foreach ($data['cluster_results'] as $i => $row) {
                         ClusterPeta::create([

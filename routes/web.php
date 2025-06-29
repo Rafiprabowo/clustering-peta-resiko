@@ -25,6 +25,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\RTMController;
 use App\Http\Controllers\ImportedExcelController;
+use App\Imports\PetaRisikoImport;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
@@ -159,8 +160,19 @@ Route::post('/peta-risiko/tambahtugas/{jenis}', [PetaController::class, 'tambaht
 
 // Route::get('/petas/{id}/tugas', [PetaController::class, 'tugas'])->name('petas.tugas')
 //     ->middleware('auth');
-Route::get('/petas-tabel', [PetaController::class, 'tabelMatrik'])->name('petas.tabel')
-    ->middleware('auth');
+Route::get('/petas-tabel', [PetaController::class, 'tabelMatrik'])->name('petas.tabel')->middleware('auth');
+
+Route::get('/petas-identifikasi-risiko/{tahun}', [PetaController::class, 'identifikasiRisiko'])->name('petas.exportPdfidentifikasiRisiko')->middleware('auth');
+
+Route::get('/petas/export-pdf/{jenis}/{tahun}', [PetaController::class, 'exportPdfIdentifikasiRisiko'])->name('petas.exporPdfUnitKerja');
+
+Route::get('/petas/export-excel/{jenis}/{tahun}', [PetaController::class, 'exportExcelUnitKerja'])->name('petas.exportExcelUnitKerja');
+
+Route::get('/petas-export-excel', [PetaController::class, 'exportExcelAll'])->name('petas.exportExcelAll')->middleware('auth');
+Route::get('/petas-export-pdf', [PetaController::class, 'exportPdfAll'])->name('petas.exportPdfAll')->middleware('auth');
+
+
+
 Route::get('/petas/tabel-unit-kerja/{unitKerja}', [PetaController::class, 'tabelUnitKerja'])->name('petas.tabelUnitKerja')
     ->middleware('auth');
 // Route::post('/petas/{id}/tambahtugas', [PetaController::class, 'tambahtugas'])->name('petas.tambahtugas')
@@ -197,27 +209,20 @@ Route::resource('/imported-excel', ImportedExcelController::class)->middleware('
 
 Route::prefix('/analisis/petas')->group(function(){
     Route::get('/', [AnalisisPetaRisikoController::class, 'index'])->name('analisisPr.index')->middleware('auth');
+    Route::get('/detail/{unit}/tahun/{tahun}/file{file}', [AnalisisPetaRisikoController::class, 'detailAnalisisPeta'])->name('analisisPr.detailAnalisisPetaUnitKerja');
+    Route::get('/detailPR/{id}', [AnalisisPetaRisikoController::class, 'detailPR'])->name('analisisPr.detailPR');
     Route::get('/detail-unit', [AnalisisPetaRisikoController::class, 'detailUnitKerja'])->name('analisisPr.detailUnitKerja')->middleware('auth');
-    // Route::get('/{unit}/{tahun}', [AnalisisPetaRisikoController::class, 'detailClusterPerUnitKerja'])->name('detailClusterPerUnitKerja')->middleware('auth');
     Route::get('/grafik-cluster/{unitKerja}/{tahun}', [AnalisisPetaRisikoController::class, 'grafikUnitKerja'])->name('grafikUnitKerja');
-    Route::get('/cluster', [AnalisisPetaRisikoController::class, 'detailCluster'])->name('detailCluster')->middleware('auth');
-    Route::get('/pieChart', [AnalisisPetaRisikoController::class, 'pieChart'])->name('pieChart')->middleware('auth');
 
-
-    Route::get('/heatmap', [AnalisisPetaRisikoController::class, 'heatmap'])->middleware('auth');
-
-    //Ajax
-    // Route::get('/get-files-by-year', [AnalisisPetaRisikoController::class, 'getFilesByYear'])->name('getFilesByYear')->middleware('auth');
+    Route::get('/get-files-by-year', [AnalisisPetaRisikoController::class, 'getFilesByYear']);
 
 });
 
 Route::prefix('clustering')->group(function(){
     Route::get('/', [ClusteringController::class, 'index'])->name('clustering.index')->middleware('auth');
-    Route::get('/detail/{id}', [ClusteringController::class, 'detailById'])->name('clustering.detailById')->middleware('auth');
-
-
-
-
+    Route::get('/detailClustering/{id}', [ClusteringController::class, 'detail'])->name('clustering.detail')->middleware('auth');
+    Route::get('/PR/detail/{id}', [ClusteringController::class, 'detailPR'])->name('clustering.detailPR')->middleware('auth');
+    Route::get('/PR/cleaned/detail/{id}', [ClusteringController::class, 'detailCleanedPR'])->name('clustering.detailCleanedPR')->middleware('auth');
     Route::get('/prediksi', [ClusteringController::class, 'buatPrediksi'])->middleware('auth');
     Route::post('/prediksi', [ClusteringController::class, 'prosesPrediksi'])->middleware('auth');
     Route::get('/data-peta-risiko', [ClusteringController::class, 'showPetaRisikoMentah'])->middleware('auth');

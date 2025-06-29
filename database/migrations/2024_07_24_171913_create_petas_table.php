@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             // $table->unsignedBigInteger('id_kegiatan');
             // $table->string('nama');
-            $table->string('judul');
+            $table->text('judul');
             $table->string('jenis'); //unit kerja
             $table->string('anggaran');
             // $table->string('nama');

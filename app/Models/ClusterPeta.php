@@ -14,15 +14,6 @@ class ClusterPeta extends Model
         'cluster'
     ];
 
-
-    public function run(){
-        return $this->belongsTo(ClusteringRun::class, 'id_clustering_run');
-    }
-
-    public function cleaned(){
-        return $this->belongsTo(PetaCleaned::class, 'id_peta_cleaned');
-    }
-
     public function interpretasi(){
         return $this->hasOne(InterpretasiCluster::class, 'cluster', 'cluster')
             ->whereColumn('id_clustering_run', 'id_clustering_run');

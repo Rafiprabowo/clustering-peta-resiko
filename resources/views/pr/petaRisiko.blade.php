@@ -123,8 +123,12 @@
                                             <a href="{{ route('peta.penelaah') }}" class="btn btn-md btn-outline-primary mb-1">
                                                 Tambah Penelaah
                                             </a>
-                                            <a href="{{ route('peta.export-excel') }}" class="btn btn-success mb-1">
+                                            <a href="{{ route('petas.exportExcelAll') }}" class="btn btn-success mb-1">
                                                 <i class="fas fa-file-excel"></i> Export Excel
+                                            </a>
+
+                                               <a href="{{ route('petas.exportPdfidentifikasiRisiko', ['tahun' => $selectedYear]) }}" class="btn btn-outline-primary mb-1">
+                                                <i class="fas fa-file"></i> Download File Pdf & Excel
                                             </a>
                                         @endif
                                     </div>

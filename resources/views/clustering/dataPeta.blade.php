@@ -1,11 +1,11 @@
 @extends('layout.app')
-@section('title', 'Preprocessing Data Peta Risiko')
+@section('title', 'Data Peta Risiko')
 @section('main')
     <div class="main-content">
         <section class="section">
             <div class="section-header d-flex align-items-center">
                 <a href="{{ url()->previous() }}" class="mr-3"><i class="fas fa-arrow-left" style="font-size: 1.3rem"></i></a>
-                <h1>Preprocessing Data Peta Risiko</h1>
+                <h1>Data Peta Risiko</h1>
             </div>
             <div class="section-body">
                 <div class="row">

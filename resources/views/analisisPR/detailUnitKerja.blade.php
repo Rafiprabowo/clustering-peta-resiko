@@ -50,6 +50,9 @@
                                                 <th>Judul</th>
                                                 <th>IKU</th>
                                                 <th>Anggaran</th>
+                                                <th>Skor Dampak</th>
+                                                <th>Skor Kemungkinan</th>
+
                                                 <th>Pernyataan Risiko</th>
                                             </tr>
                                         </thead>
@@ -63,6 +66,20 @@
                                                     <td>{{ $item->cleaned->nmKegiatan }}</td>
                                                     <td>{{ $item->cleaned->iku }}</td>
                                                     <td>{{ $item->cleaned->nilRabUsulan }}</td>
+                                                    <td>{{ match ($item->cleaned->dampak) {
+                                                         "Sangat Berpengaruh"=> 5,
+                                                         "Berpengaruh"=> 4,
+                                                         "Cukup Berpengaruh"=> 3,
+                                                         "Sedikit Berpengaruh"=> 2,
+                                                         "Sangat Sedikit Berpengaruh"=> 1,
+                                                    } }}</td>
+                                                    <td>{{ match ($item->cleaned->probaBilitas) {
+                                                         "Sangat Sering"=> 5,
+                                                         "Sering"=> 4 ,
+                                                         "Kadang-kadang"=> 3 ,
+                                                         "Jarang"=> 2 ,
+                                                         "Sangat Jarang"=> 1 ,
+                                                    } }}</td>
                                                     <td>{{ $item->cleaned->pernyataanRisiko }}</td>
                                                 </tr>
                                             @endforeach

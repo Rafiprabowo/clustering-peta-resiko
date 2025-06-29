@@ -10,7 +10,7 @@ class PetaCleaned extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id_peta_awal',
+        'id_clustering_run',
         'idUsulan',
         'iku',
         'nmKegiatan',
@@ -24,12 +24,16 @@ class PetaCleaned extends Model
         'probaBilitas',
     ];
 
-    public function awal(){
-        return $this->belongsTo(PetaAwal::class, 'id_peta_awal');
+    public function clusteringRun(){
+        return $this->belongsTo(ClusteringRun::class, 'id_clustering_run');
     }
 
     public function cluster(){
         return $this->hasOne(ClusterPeta::class, 'id_peta_cleaned');
+    }
+
+    public function preprocessing(){
+        return $this->hasOne(PreprocessingPeta::class, 'id_peta_cleaned');
     }
 
 }
