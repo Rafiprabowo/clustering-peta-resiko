@@ -130,7 +130,7 @@
         </section>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // CHART 1: yang ditampilkan di tabel
@@ -162,12 +162,16 @@
                                 label: function(context) {
                                     let label = context.label || '';
                                     let value = context.raw || 0;
-                                    return `${label}: ${value}`;
+                                    let total = context.chart.data.datasets[0].data.reduce((a, b) => a +
+                                        b, 0);
+                                    let percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} (${percentage}%)`;
                                 }
                             }
                         }
                     }
                 }
+
             });
 
             // CHART 2: seluruh data (tanpa pagination)
@@ -207,8 +211,54 @@
             //     }
             // });
         });
-    </script>
+    </script> --}}
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Ambil total dari backend (global atau per cluster)
+        const totalIku =
+            {{ $selectedCluster !== null ? $totalIkuByCluster[$selectedCluster] ?? 1 : $totalIkuGlobal }};
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('ikuChart').getContext('2d');
+            const data = {
+                labels: {!! json_encode($ikus->map(fn($item, $kode) => $kode)->values()) !!},
+                datasets: [{
+                    label: 'Total IKU',
+                    data: {!! json_encode($ikus->map(fn($item) => $item['jumlah'])->values()) !!},
+                    backgroundColor: [
+                        '#ff6384', '#36a2eb', '#ffcd56', '#4bc0c0',
+                        '#9966ff', '#ff9f40', '#00a65a', '#f39c12',
+                        '#d81b60', '#3c8dbc', '#605ca8', '#39cccc'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    let value = context.raw || 0;
+                                    let percentage = ((value / totalIku) * 100).toFixed(1);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 
 
 @endsection
