@@ -15,4 +15,8 @@ class InterpretasiCluster extends Model
         'centroid',
         'interpretasi',
     ];
+
+    protected $casts = [
+        'centroid' => 'array'
+    ];
 }

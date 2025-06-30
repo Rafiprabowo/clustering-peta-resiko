@@ -29,9 +29,9 @@
                                                 <td class="text-center">{{ ($analisisPetas->currentPage() - 1) * $analisisPetas->perPage() + $index + 1 }}
                                                 </td>
                                                 <td>{{ $item->nmKegiatan }}</td>
-                                                <td>
+                                                <td class="text-center">
                                                     {{ $item->cluster->cluster ?? '-' }}
-                                                    ({{ $item->cluster && $item->cluster->interpretasi ? $item->cluster->interpretasi->interpretasi : '-' }})
+                                                    {{-- ({{ $item->cluster && $item->cluster->interpretasi ? $item->cluster->interpretasi->interpretasi : '-' }}) --}}
                                                 </td>
 
                                                 <td class="text-center">

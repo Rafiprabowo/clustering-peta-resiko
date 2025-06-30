@@ -31,6 +31,6 @@ class ClusteringRun extends Model
     }
 
     public function interpretasi(){
-        return $this->hasMany(InterpretasiCluster::class, 'id_clustering_id');
+        return $this->hasMany(InterpretasiCluster::class, 'id_clustering_run');
     }
 }

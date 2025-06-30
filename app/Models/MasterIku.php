@@ -13,7 +13,4 @@ class MasterIku extends Model
         'uraian'
     ];
 
-    public function petaRisikos(){
-        return $this->belongsToMany(PetaRisikoMentah::class, 'iku_peta', 'id_master_iku', 'id_peta_risiko_mentah');
-    }
 }

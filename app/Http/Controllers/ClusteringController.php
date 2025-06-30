@@ -40,22 +40,145 @@ class ClusteringController extends Controller
         return view('clustering.index', compact('active', 'clusteringRuns'));
     }
 
-
-
     public function detail($id)
     {
         $active = 6;
 
-        $clusteringRun = ClusteringRun::findOrFail($id);
+        $clusteringRun = ClusteringRun::with('interpretasi')->findOrFail($id);
 
         // Ambil peta awal dengan pagination
-        $petaAwals = $clusteringRun->petaAwals()->paginate(5);
+        $petaAwals = $clusteringRun->petaAwals()->orderBy('nmUnit', 'asc')->paginate(1, ['*'], 'data_peta_awal');
 
         // Ambil peta cleaned + relasi (kalau mau sekalian)
-        $petaCleaneds = $clusteringRun->petaCleaneds()->with(['preprocessing', 'cluster.interpretasi'])->get();
+        $petaCleaneds = $clusteringRun->petaCleaneds()->orderBy('nmUnit', 'asc')->with(['preprocessing', 'cluster.interpretasi'])->paginate(1, ['*'], 'peta_cleaneds_page');
 
         return view('clustering.detail', compact('active', 'clusteringRun', 'petaAwals', 'petaCleaneds'));
     }
+
+public function detailVisualisasi($id, Request $request)
+{
+    $active = 6;
+
+    $clusteringRun = ClusteringRun::with('interpretasi')->findOrFail($id);
+
+    // Ambil daftar cluster yang digunakan
+    $clusters = ClusterPeta::where('id_clustering_run', $id)
+        ->select('cluster')
+        ->distinct()
+        ->orderBy('cluster')
+        ->pluck('cluster');
+
+    // Ambil cluster yang dipilih dari query string
+    $selectedCluster = $request->has('cluster') ? $request->input('cluster') : null;
+
+    // Build query dasar
+    $query = DB::table('peta_cleaneds')
+        ->join('cluster_petas', 'peta_cleaneds.id', '=', 'cluster_petas.id_peta_cleaned')
+        ->where('cluster_petas.id_clustering_run', $id)
+        ->select(
+            'peta_cleaneds.id',
+            'peta_cleaneds.iku',
+            'peta_cleaneds.idUsulan',
+            'cluster_petas.cluster'
+        )
+        ->orderBy('peta_cleaneds.id');
+
+    // Tambahkan filter cluster jika ada
+    if (!is_null($selectedCluster)) {
+        $query->where('cluster_petas.cluster', $selectedCluster);
+    }
+
+    // Ambil semua data hasil query
+    $petaCleanedsRaw = $query->get();
+
+    // Ambil master IKU
+    $masterIku = MasterIku::all()->keyBy('kode_iku');
+
+    // Buat struktur data semua IKU (tanpa pagination) + idUsulan
+    $ikusFull = $petaCleanedsRaw
+        ->flatMap(function ($item) {
+            $ikus = array_map('trim', explode(',', $item->iku));
+            return collect($ikus)->map(fn($kodeIku) => [
+                'kode' => $kodeIku,
+                'idUsulan' => $item->idUsulan,
+            ]);
+        })
+        ->groupBy('kode')
+        ->map(function ($items, $kode) use ($masterIku) {
+            return [
+                'uraian' => $masterIku[$kode]->uraian ?? '-',
+                'jumlah' => $items->count(),
+                'idUsulan' => $items->pluck('idUsulan')->unique()->toArray(),
+            ];
+        });
+
+    // Ambil data global untuk paginasi
+    $ikuGlobal = $ikusFull;
+
+    // Ambil paginasi
+    $currentPage = $request->get('page', 1);
+    $perPage = 5;
+    $ikuGlobalPaginated = new LengthAwarePaginator(
+        $ikuGlobal->forPage($currentPage, $perPage),
+        $ikuGlobal->count(),
+        $perPage,
+        $currentPage,
+        ['path' => $request->url(), 'query' => $request->query()]
+    );
+
+    // Per cluster (seluruh data)
+    $ikusByCluster = $petaCleanedsRaw
+        ->groupBy('cluster')
+        ->map(function ($items) use ($masterIku) {
+            return collect($items)
+                ->flatMap(function ($item) {
+                    $ikus = array_map('trim', explode(',', $item->iku));
+                    return collect($ikus)->map(fn($kodeIku) => [
+                        'kode' => $kodeIku,
+                        'idUsulan' => $item->idUsulan,
+                    ]);
+                })
+                ->groupBy('kode')
+                ->map(function ($items, $kode) use ($masterIku) {
+                    return [
+                        'uraian' => $masterIku[$kode]->uraian ?? '-',
+                        'jumlah' => $items->count(),
+                        'idUsulan' => $items->pluck('idUsulan')->unique()->toArray(),
+                    ];
+                });
+        });
+
+    // Jika cluster dipilih, ambil datanya untuk paginasi
+    $ikusPaginated = null;
+    if (!is_null($selectedCluster) && isset($ikusByCluster[$selectedCluster])) {
+        $ikusClusterSelected = $ikusByCluster[$selectedCluster];
+        $ikusPaginated = new LengthAwarePaginator(
+            $ikusClusterSelected->forPage($currentPage, $perPage),
+            $ikusClusterSelected->count(),
+            $perPage,
+            $currentPage,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+    }
+
+    // Total untuk ditampilkan di header
+    $totalIkuGlobal = $ikuGlobal->sum(fn($item) => $item['jumlah']);
+    $totalIkuByCluster = $ikusByCluster->map(fn($items) => collect($items)->sum('jumlah'));
+
+    return view('clustering.detailVisualisasi', compact(
+        'active',
+        'clusters',
+        'selectedCluster',
+        'clusteringRun',
+        'ikusByCluster',
+        'ikuGlobalPaginated',
+        'ikuGlobal',
+        'ikusPaginated',
+        'ikusFull',
+        'totalIkuGlobal',
+        'totalIkuByCluster'
+    ));
+}
 
 
 
@@ -69,102 +192,6 @@ class ClusteringController extends Controller
         return view('clustering.detailPR', compact('active', 'peta'));
     }
 
-    public function detailCleanedPR($id){
-        $active = 6;
-
-        $peta = PetaCleaned::findOrFail($id);
-
-        return view('clustering.detailCleanedPR', compact('active', 'peta'));
-    }
-
-     public function detailTransform($id){
-        $active  = 6;
-        $petaRisiko = PetaRisikoMentah::with('transformed')->findOrFail($id);
-
-        return view('clustering.detailTransformPeta', compact('active', 'petaRisiko'));
-    }
-
-    public function detailProcessingPeta($id){
-        $active  = 6;
-        $petaRisiko = PetaRisikoMentah::with('processing')->findOrFail($id);
-
-        return view('clustering.detailProcessingPeta', compact('active', 'petaRisiko'));
-    }
-
-    public function detailPetaMentahById($id){
-        $active = 6;
-
-        $petaRisiko = PetaRisikoMentah::with('processing')->findOrFail($id);
-
-        return view('clustering.detailPetaRisikoById', compact('active', 'petaRisiko'));
-
-    }
-
-    public function showPetaRisikoMentah(Request $request){
-        $active = 6;
-
-        $selectedYear = $request->input('year');
-        $selectedFile = $request->get('file');
-
-        $years = PetaRisikoMentah::selectRaw('YEAR(created_at) as year')
-            ->distinct()
-            ->orderByDesc('year')
-            ->pluck('year');
-
-        $fileNames = PetaRisikoFile::pluck('nama_file');
-
-        $fileId = null;
-        if ($selectedFile){
-            $fileId = PetaRisikoFile::where('nama_file', $selectedFile)->value('id');
-        }
-
-
-        $query = PetaRisikoMentah::select('nmUnit', DB::raw('YEAR(created_at) as tahun'), DB::raw('COUNT(*) as total'))
-            ->when($selectedYear, function($q) use ($selectedYear){
-                return $q->whereYear('created_at', $selectedYear);
-            })
-            ->when($fileId, function ($q) use ($fileId){
-                return $q->where('id_file_peta_risiko', $fileId);
-            })
-            ->groupBy('nmUnit', DB::raw('YEAR(created_at)'))
-            ->orderBy('nmUnit')
-            ->orderBy(DB::raw('YEAR(created_at)'), 'desc');
-
-
-        $results = $query->get();
-
-        $perPage = 5;
-        $page = $request->input('page', 1);
-        $offset = ($page - 1) * $perPage;
-
-        $itemsForCurrentPage = $results->slice($offset, $perPage)->values();
-
-        $unitKerjas =  new LengthAwarePaginator(
-            $itemsForCurrentPage,
-            $results->count(),
-            $perPage,
-            $page,
-            ['path' => $request->url(), 'query' => $request->query()]
-        );
-
-        return view('clustering.petaRisikoMentah', compact('active', 'unitKerjas', 'years', 'fileNames' ,'selectedYear', 'selectedFile'));
-    }
-
-    public function showDetailPetaRisikoMentah($unit, $tahun){
-        $active = 6;
-
-        // Decode nama unit yang dikirim via URL
-        $decodedUnit = urldecode($unit);
-
-        $petaRisikos = PetaRisikoMentah::with('processing')
-        ->where('nmUnit', $decodedUnit)
-        ->whereYear('created_at', $tahun)
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-        return view('clustering.detailPetaRisikoMentah', compact('active', 'decodedUnit', 'tahun', 'petaRisikos'));
-    }
-
 
     public function buatPrediksi(){
         // Menu analisis peta risiko
@@ -175,101 +202,105 @@ class ClusteringController extends Controller
         return view('clustering.buatPrediksi', compact('active', 'years'));
     }
 
-    public function prosesPrediksi(Request $request){
+    public function prosesPrediksi(Request $request)
+    {
         $request->validate([
             'file' => 'required|mimes:xlsx,xls',
-
         ]);
 
-            try{
-                $file = $request->file('file');
+        try {
+            $file = $request->file('file');
 
-                $response = Http::attach('file', file_get_contents($file), $file->getClientOriginalName())->post('http://localhost:8001/uploadFile');
+            $response = Http::attach('file', file_get_contents($file), $file->getClientOriginalName())
+                ->post('http://localhost:8001/uploadFile');
 
-                if($response->successful()){
-                    $data = $response->json();
+            if ($response->successful()) {
+                $data = $response->json();
 
-                    $clusteringRun = ClusteringRun::create([
-                        'nama_file' => $data['filename'],
-                        'tahun' => now()->year,
-                        'jumlah_cluster' => $data['clustering_run']['jumlah_cluster'],
-                        'silhouette_score' => $data['clustering_run']['silhouette_score']
+                // Simpan informasi clustering run
+                $clusteringRun = ClusteringRun::create([
+                    'nama_file' => $data['filename'],
+                    'tahun' => now()->year,
+                    'jumlah_cluster' => $data['clustering_run']['jumlah_cluster'],
+                    'silhouette_score' => $data['clustering_run']['silhouette_score'],
+                ]);
+
+                // Simpan Peta Awal
+                foreach ($data['peta_awals'] as $row) {
+                    PetaAwal::create([
+                        'id_clustering_run' => $clusteringRun->id,
+                        'idUsulan' => $row['idUsulan'] ?? '',
+                        'iku' => $row['kode_iku'] ?? '',
+                        'nmKegiatan' => $row['nmKegiatan'] ?? '',
+                        'nilRabUsulan' => $row['nilRabUsulan'] ?? '',
+                        'nmUnit' => $row['nmUnit'] ?? '',
+                        'pernyataanRisiko' => $row['pernyataanRisiko'] ?? '',
+                        'uraianDampak' => $row['uraianDampak'] ?? '',
+                        'Resiko' => $row['Resiko'] ?? '',
+                        'dampak' => $row['dampak'] ?? '',
+                        'probaBilitas' => $row['probaBilitas'] ?? '',
+                        'pengendalian' => $row['pengendalian'] ?? '',
+                    ]);
+                }
+
+                // Simpan Peta Cleaned dan petakan index_cleaned ke ID-nya
+                $cleanedIdMap = [];
+                foreach ($data['peta_cleaneds'] as $i => $row) {
+                    $petaCleaned = PetaCleaned::create([
+                        'id_clustering_run' => $clusteringRun->id,
+                        'idUsulan' => $row['idUsulan'] ?? '',
+                        'iku' => $row['kode_iku'] ?? '',
+                        'nmKegiatan' => $row['nmKegiatan'] ?? '',
+                        'nilRabUsulan' => $row['nilRabUsulan'] ?? '',
+                        'nmUnit' => $row['nmUnit'] ?? '',
+                        'pernyataanRisiko' => $row['pernyataanRisiko'] ?? '',
+                        'uraianDampak' => $row['uraianDampak'] ?? '',
+                        'Resiko' => $row['Resiko'] ?? '',
+                        'dampak' => $row['dampak'] ?? '',
+                        'probaBilitas' => $row['probaBilitas'] ?? '',
+                        'pengendalian' => $row['pengendalian'] ?? '',
                     ]);
 
-
-                    foreach($data['peta_awals'] as $row){
-                        $petaAwal = PetaAwal::create([
-                            'id_clustering_run' => $clusteringRun->id,
-                            'idUsulan' => $row['idUsulan'] ?? '',
-                            'iku' => $row['kode_iku'] ?? '',
-                            'nmKegiatan' => $row['nmKegiatan'] ?? '',
-                            'nilRabUsulan' => $row['nilRabUsulan'] ?? '',
-                            'nmUnit' => $row['nmUnit'] ?? '',
-                            'pernyataanRisiko' => $row['pernyataanRisiko'] ?? '',
-                            'uraianDampak' => $row['uraianDampak'] ?? '',
-                            'Resiko' => $row['Resiko'] ?? '',
-                            'dampak' => $row['dampak'] ?? '',
-                            'probaBilitas' => $row['probaBilitas'] ?? '',
-                            'pengendalian' => $row['pengendalian'] ?? ''
-                        ]);
-
-                    }
-
-                    foreach($data['peta_cleaneds'] as $row){
-                        PetaCleaned::create([
-                            'id_clustering_run' => $clusteringRun->id,
-                            'idUsulan' => $row['idUsulan'] ?? '',
-                            'iku' => $row['kode_iku'] ?? '',
-                            'nmKegiatan' => $row['nmKegiatan'] ?? '',
-                            'nilRabUsulan' => $row['nilRabUsulan'] ?? '',
-                            'nmUnit' => $row['nmUnit'] ?? '',
-                            'pernyataanRisiko' => $row['pernyataanRisiko'] ?? '',
-                            'uraianDampak' => $row['uraianDampak'] ?? '',
-                            'Resiko' => $row['Resiko'] ?? '',
-                            'dampak' => $row['dampak'] ?? '',
-                            'probaBilitas' => $row['probaBilitas'] ?? '',
-                            'pengendalian' => $row['pengendalian'] ?? ''
-                        ]);
-                    }
-
-                    $cleanedIds = PetaCleaned::latest()->take(count($data['peta_cleaneds']))->pluck('id')->reverse()->values();
-
-                    foreach ($data['preprocessing'] as $i => $pre) {
-                        PreprocessingPeta::create([
-                            'id_peta_cleaned' => $cleanedIds[$i],
-                            'transform' => json_encode($pre['transform']),
-                            'normalisasi' => json_encode($pre['normalisasi'])
-                        ]);
-                    }
-
-
-
-                    foreach ($data['cluster_results'] as $i => $row) {
-                        ClusterPeta::create([
-                            'id_peta_cleaned' => $cleanedIds[$row['index_cleaned']],
-                            'id_clustering_run' => $clusteringRun->id,
-                            'cluster' => $row['cluster']
-                        ]);
-                    }
-
-                    foreach ($data['interpretasi_clusters'] as $interpret) {
-                        InterpretasiCluster::create([
-                            'id_clustering_run' => $clusteringRun->id,
-                            'cluster' => $interpret['cluster'],
-                            'centroid' => json_encode($interpret['centroid']),
-                            'interpretasi' => $interpret['interpretasi']
-                        ]);
-                    }
-
-                    return redirect()->route('analisisPr.index')->with('success', 'Data berhasil disimpan');
-
-                }else{
-                    return back()->with('error', 'Gagal mengirim ke API. Status: ' . $response->status());
+                    // simpan ke dalam map berdasarkan index
+                    $cleanedIdMap[$i] = $petaCleaned->id;
                 }
-            }catch(\Exception $e){
-                return back()->with('error', 'Terjadi Error: '. $e->getMessage());
+
+                // Simpan preprocessing
+                foreach ($data['preprocessing'] as $pre) {
+                    $index = $pre['index_cleaned'];
+                    PreprocessingPeta::create([
+                        'id_peta_cleaned' => $cleanedIdMap[$index],
+                        'transform' => json_encode($pre['transform']),
+                        'normalisasi' => json_encode($pre['normalisasi']),
+                    ]);
+                }
+
+                // Simpan hasil cluster
+                foreach ($data['cluster_results'] as $row) {
+                    ClusterPeta::create([
+                        'id_peta_cleaned' => $cleanedIdMap[$row['index_cleaned']],
+                        'id_clustering_run' => $clusteringRun->id,
+                        'cluster' => $row['cluster'],
+                    ]);
+                }
+
+                // Simpan interpretasi cluster
+                foreach ($data['interpretasi_clusters'] as $interpret) {
+                    InterpretasiCluster::create([
+                        'id_clustering_run' => $clusteringRun->id,
+                        'cluster' => $interpret['cluster'],
+                        'centroid' => json_encode($interpret['centroid']),
+                        'interpretasi' => $interpret['interpretasi'],
+                    ]);
+                }
+
+                return redirect()->route('analisisPr.index')->with('success', 'Data berhasil disimpan');
+            } else {
+                return back()->with('error', 'Gagal mengirim ke API. Status: ' . $response->status());
             }
-
-
+        } catch (\Exception $e) {
+            return back()->with('error', 'Terjadi Error: ' . $e->getMessage());
+        }
     }
+
 }

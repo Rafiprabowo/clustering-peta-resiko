@@ -211,25 +211,16 @@ Route::prefix('/analisis/petas')->group(function(){
     Route::get('/', [AnalisisPetaRisikoController::class, 'index'])->name('analisisPr.index')->middleware('auth');
     Route::get('/detail/{unit}/tahun/{tahun}/file{file}', [AnalisisPetaRisikoController::class, 'detailAnalisisPeta'])->name('analisisPr.detailAnalisisPetaUnitKerja');
     Route::get('/detailPR/{id}', [AnalisisPetaRisikoController::class, 'detailPR'])->name('analisisPr.detailPR');
-    Route::get('/detail-unit', [AnalisisPetaRisikoController::class, 'detailUnitKerja'])->name('analisisPr.detailUnitKerja')->middleware('auth');
-    Route::get('/grafik-cluster/{unitKerja}/{tahun}', [AnalisisPetaRisikoController::class, 'grafikUnitKerja'])->name('grafikUnitKerja');
-
-    Route::get('/get-files-by-year', [AnalisisPetaRisikoController::class, 'getFilesByYear']);
-
 });
 
 Route::prefix('clustering')->group(function(){
     Route::get('/', [ClusteringController::class, 'index'])->name('clustering.index')->middleware('auth');
     Route::get('/detailClustering/{id}', [ClusteringController::class, 'detail'])->name('clustering.detail')->middleware('auth');
+     Route::get('/visualisasi/{id}', [ClusteringController::class, 'detailVisualisasi'])->name('clustering.detailVisualisasi')->middleware('auth');
     Route::get('/PR/detail/{id}', [ClusteringController::class, 'detailPR'])->name('clustering.detailPR')->middleware('auth');
-    Route::get('/PR/cleaned/detail/{id}', [ClusteringController::class, 'detailCleanedPR'])->name('clustering.detailCleanedPR')->middleware('auth');
+
     Route::get('/prediksi', [ClusteringController::class, 'buatPrediksi'])->middleware('auth');
     Route::post('/prediksi', [ClusteringController::class, 'prosesPrediksi'])->middleware('auth');
-    Route::get('/data-peta-risiko', [ClusteringController::class, 'showPetaRisikoMentah'])->middleware('auth');
-    Route::get('/data-peta-risiko/processing/{id}', [ClusteringController::class, 'detailProcessingPeta'])->name('detailProcessingPeta')->middleware('auth');
-    Route::get('/data-peta-risiko/transform/{id}', [ClusteringController::class, 'detailTransform'])->name('detailTransformPeta')->middleware('auth');
-    Route::get('/data-peta-risiko/{id}', [ClusteringController::class, 'detailPetaMentahById'])->name('detailPetaRisikoById')->middleware('auth');
-    Route::get('/data-peta-risiko/{unit}/{tahun}', [ClusteringController::class, 'showDetailPetaRisikoMentah'])->name('detailPetaRisikoPerUnitKerja')->middleware('auth');
 });
 
 

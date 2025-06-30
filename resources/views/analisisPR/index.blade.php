@@ -52,6 +52,7 @@
                                             <a href="{{ route('clustering.index', ['tahun' => $selectedYear]) }}" class="btn btn-primary mb-1">
                                                 <i class="fas fa-chart-simple"></i> Clustering
                                             </a>
+
                                         @endif
 
                                     </div>

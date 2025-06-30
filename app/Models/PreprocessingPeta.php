@@ -13,4 +13,8 @@ class PreprocessingPeta extends Model
         'transform',
         'normalisasi'
     ];
+    protected $casts = [
+        'transform' => 'array',
+        'normalisasi' => 'array',
+    ];
 }
