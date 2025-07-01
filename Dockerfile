@@ -7,12 +7,11 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-configure gd \
     && docker-php-ext-install gd pdo pdo_mysql mbstring zip
 
-# Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
 COPY . .
 
-RUN composer install --no-interaction --prefer-dist \
+RUN composer install --no-interaction --prefer-dist --no-dev \
     && chown -R www-data:www-data /var/www
