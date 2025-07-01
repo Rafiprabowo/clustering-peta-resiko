@@ -6,8 +6,11 @@ services:
       context: .
     volumes:
       - .:/var/www
+    working_dir: /var/www
     networks:
       - laravel
+    depends_on:
+      - db
 
   web:
     image: nginx:alpine
@@ -35,8 +38,18 @@ services:
     networks:
       - laravel
 
+  clustering-api:
+    build:
+      context: ../clustering-API  # Ganti sesuai path folder FastAPI kamu
+    container_name: clustering-api
+    ports:
+      - "8001:8001"
+    networks:
+      - laravel
+
 networks:
   laravel:
+    driver: bridge
 
 volumes:
   db_data:

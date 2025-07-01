@@ -211,8 +211,11 @@ public function detailVisualisasi($id, Request $request)
         try {
             $file = $request->file('file');
 
-            $response = Http::attach('file', file_get_contents($file), $file->getClientOriginalName())
-                ->post('http://localhost:8001/uploadFile');
+            $response = Http::attach(
+                'file',
+                file_get_contents($file),
+                $file->getClientOriginalName()
+            )->post(env('CLUSTERING_API_URL') . '/uploadFile');
 
             if ($response->successful()) {
                 $data = $response->json();
