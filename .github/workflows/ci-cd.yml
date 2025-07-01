@@ -9,40 +9,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Set up SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
-   - name: Deploy to VPS
-      run: |
-        ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
-          set -e
+      - name: Deploy to VPS
+        run: |
+          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+            set -e
 
-          # Clone repo jika belum ada
-          if [ ! -d /var/www/clustering-peta-resiko ]; then
-            git clone https://github.com/Rafiprabowo/clustering-peta-resiko.git /var/www/clustering-peta-resiko
-          fi
+            # Clone repo jika belum ada
+            if [ ! -d /var/www/clustering-peta-resiko ]; then
+              git clone https://github.com/Rafiprabowo/clustering-peta-resiko.git /var/www/clustering-peta-resiko
+            fi
 
-          cd /var/www/clustering-peta-resiko
+            cd /var/www/clustering-peta-resiko
 
-          # Pastikan update ke remote branch
-          git fetch origin
-          git reset --hard origin/main
+            # Pastikan update ke remote branch
+            git fetch origin
+            git reset --hard origin/main
 
-          # Stop & rebuild container
-          docker compose down || true
-          docker compose up -d --build
+            # Stop & rebuild container
+            docker compose down || true
+            docker compose up -d --build
 
-          # Jalankan perintah Laravel
-          docker compose exec app composer install --no-interaction --prefer-dist
-          docker compose exec app php artisan migrate --force
-          docker compose exec app php artisan db:seed --force
-        EOF
-
-
+            # Jalankan perintah Laravel
+            docker compose exec app composer install --no-interaction --prefer-dist
+            docker compose exec app php artisan migrate --force
+            docker compose exec app php artisan db:seed --force
+          EOF
