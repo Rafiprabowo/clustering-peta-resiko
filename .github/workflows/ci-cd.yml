@@ -22,7 +22,7 @@ jobs:
     - name: Deploy to VPS
       run: |
         ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
-          cd /var/www/laravel
+          cd /var/www/clustering-peta-resiko
           git pull origin main
           docker compose down
           docker compose up -d --build
