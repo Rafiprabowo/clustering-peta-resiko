@@ -19,19 +19,14 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
-    - name: Deploy to VPS
+   - name: Deploy to VPS
       run: |
         ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
-          set -e
-          cd /var/www/clustering-peta-resiko || git clone https://github.com/Rafiprabowo/clustering-peta-resiko.git /var/www/clustering-peta-resiko
-          cd /var/www/clustering-peta-resiko
+          cd /var/www/clustering-peta-resiko || exit 1
+          git fetch origin
           git reset --hard origin/main
-          git pull origin main
-          docker compose down || true
-          docker compose build || (docker pull php:8.2-fpm && docker pull composer:latest && docker compose build)
-          docker compose up -d
-          docker compose exec app composer install --no-interaction --prefer-dist
-          docker compose exec app php artisan migrate --force
-          docker compose exec app php artisan db:seed --force
+          docker compose down
+          docker compose up -d --build
         EOF
+
 
