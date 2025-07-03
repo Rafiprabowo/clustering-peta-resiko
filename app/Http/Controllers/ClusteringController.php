@@ -46,13 +46,10 @@ class ClusteringController extends Controller
 
         $clusteringRun = ClusteringRun::with('interpretasi')->findOrFail($id);
 
-        // Ambil peta awal dengan pagination
-        $petaAwals = $clusteringRun->petaAwals()->orderBy('nmUnit', 'asc')->paginate(1, ['*'], 'data_peta_awal');
-
         // Ambil peta cleaned + relasi (kalau mau sekalian)
-        $petaCleaneds = $clusteringRun->petaCleaneds()->orderBy('nmUnit', 'asc')->with(['preprocessing', 'cluster.interpretasi'])->paginate(1, ['*'], 'peta_cleaneds_page');
+        $petaCleaneds = $clusteringRun->petaCleaneds()->orderBy('nmUnit', 'asc')->with(['preprocessing', 'cluster.interpretasi'])->paginate(5);
 
-        return view('clustering.detail', compact('active', 'clusteringRun', 'petaAwals', 'petaCleaneds'));
+        return view('clustering.detail', compact('active', 'clusteringRun', 'petaCleaneds'));
     }
 
 public function detailVisualisasi($id, Request $request)

@@ -12,66 +12,13 @@
                     <span class="span0">Nama File : {{  $clusteringRun->nama_file }}</span>
                     {{-- <span class="span1">{{ $jenis }}</span> --}}
                 </h4>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card border-0 shadow rounded">
-                            <div class="card-header">
-                                <h5>Data Peta Risiko Sebelum Cleaning</h5>
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr class="text-center">
-                                            <th>No</th>
-                                            <th>Nama Unit</th>
-                                            <th>IKU</th>
-                                            <th>Judul</th>
-                                            <th>Anggaran</th>
-                                            <th>Skor Probabilitas</th>
-                                            <th>Skor Dampak</th>
-                                            <th>Uraian</th>
-                                            <th>Resiko</th>
-                                            <th>Pernyataan</th>
-                                            <th>Pengendalian</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($petaAwals as $index => $item)
-                                            <tr>
-                                                <td class="align-top">
-                                                    {{ ($petaAwals->currentPage() - 1) * $petaAwals->perPage() + $index + 1 }}
-                                                </td>
-                                                <td class="align-top">{{ $item->nmUnit }}</td>
-                                                <td class="align-top">{{ $item->iku }}</td>
-                                                <td class="align-top">{{ $item->nmKegiatan }}</td>
-                                                <td class="align-top">{{ $item->nilRabUsulan }}</td>
-                                                <td class="align-top">{{ $item->probaBilitas }}</td>
-                                                <td class="align-top">{{ $item->dampak }}</td>
-                                                <td class="align-top">{{ $item->uraianDampak }}</td>
-                                                <td class="align-top">{{ $item->Resiko }}</td>
-                                                <td class="align-top">{{ $item->pernyataanRisiko }}</td>
-                                                <td class="align-top">{{ $item->pengendalian }}</td>
-                                            </tr>
-                                        @empty
-                                            <div class="alert alert-danger">
-                                                Data Peta Risio belum Tersedia
-                                            </div>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                                {{ $petaAwals->links('pagination::bootstrap-4') }}
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
 
                 {{-- Cleaning --}}
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card border-0 shadow rounded">
                             <div class="card-header">
-                                <h5>Data Peta Risiko Setelah Cleaning</h5>
+                                <h5>Data Peta Risiko</h5>
                             </div>
                             <div class="card-body">
                                 <table class="table table-bordered">
@@ -84,10 +31,7 @@
                                             <th>Anggaran</th>
                                             <th>Skor Probabilitas</th>
                                             <th>Skor Dampak</th>
-                                            <th>Uraian</th>
-                                            <th>Resiko</th>
-                                            <th>Pernyataan</th>
-                                            <th>Pengendalian</th>
+
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -102,10 +46,7 @@
                                                 <td class="align-top">{{ $item->nilRabUsulan }}</td>
                                                 <td class="align-top">{{ $item->probaBilitas }}</td>
                                                 <td class="align-top">{{ $item->dampak }}</td>
-                                                <td class="align-top">{{ $item->uraianDampak }}</td>
-                                                <td class="align-top">{{ $item->Resiko }}</td>
-                                                <td class="align-top">{{ $item->pernyataanRisiko }}</td>
-                                                <td class="align-top">{{ $item->pengendalian }}</td>
+
                                             </tr>
                                         @empty
                                             <div class="alert alert-danger">
@@ -121,188 +62,6 @@
                     </div>
                 </div>
 
-                {{-- Transform --}}
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card border-0 shadow rounded">
-                            <div class="card-header">
-                                <h5>Data Peta Risiko Setelah Transform</h5>
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr class="text-center">
-                                            <th>No</th>
-                                            <th>Nama Unit</th>
-                                            <th>IKU</th>
-                                            <th>Judul</th>
-                                            <th>Anggaran</th>
-                                            <th>Skor Probabilitas</th>
-                                            <th>Skor Dampak</th>
-                                            <th>Uraian</th>
-                                            <th>Resiko</th>
-                                            <th>Pernyataan</th>
-                                            <th>Pengendalian</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($petaCleaneds as $index => $item)
-                                            @php
-                                                $transform = json_decode($item->preprocessing->transform, true);
-                                            @endphp
-                                            <tr>
-                                                <td class="align-top">
-                                                    {{ ($petaCleaneds->currentPage() - 1) * $petaCleaneds->perPage() + $index + 1 }}
-                                                </td>
-                                                <td class="align-top">{{ $item->nmUnit }}</td>
-                                                <td class="align-top">{{ number_format($transform['iku'], 1) }}</td>
-                                                <td class="align-top">{{ $item->nmKegiatan }}</td>
-                                                <td class="align-top">{{ $item->nilRabUsulan }}</td>
-                                                <td class="align-top">{{ number_format($transform['probaBilitas']) }}</td>
-                                                <td class="align-top">{{ number_format($transform['dampak']) }}</td>
-                                                <td class="align-top">{{ $item->uraianDampak }}</td>
-                                                <td class="align-top">{{ $item->Resiko }}</td>
-                                                <td class="align-top">{{ $item->pernyataanRisiko }}</td>
-                                                <td class="align-top">{{ $item->pengendalian }}</td>
-                                            </tr>
-                                        @empty
-                                            <div class="alert alert-danger">
-                                                Data Hasil Transform belum Tersedia
-                                            </div>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                                {{ $petaCleaneds->links('pagination::bootstrap-4') }}
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Normalisasi --}}
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card border-0 shadow rounded">
-                            <div class="card-header">
-                                <h5>Data Peta Risiko Setelah Normalisasi</h5>
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr class="text-center">
-                                            <th>No</th>
-                                            <th>Nama Unit</th>
-                                            <th>IKU</th>
-                                            <th>Judul</th>
-                                            <th>Anggaran</th>
-                                            <th>Tingkat Risiko</th>
-                                            <th>Uraian</th>
-                                            <th>Resiko</th>
-                                            <th>Pernyataan</th>
-                                            <th>Pengendalian</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($petaCleaneds as $index => $item)
-                                            @php
-                                                $normalisasi = json_decode($item->preprocessing->normalisasi, true);
-                                            @endphp
-                                            <tr>
-                                                <td class="align-top">
-                                                    {{ ($petaCleaneds->currentPage() - 1) * $petaCleaneds->perPage() + $index + 1 }}
-                                                </td>
-                                                <td class="align-top">{{ $item->nmUnit }}</td>
-                                                <td class="align-top">{{ number_format($normalisasi['skor_iku'], 10) }}
-                                                </td>
-                                                <td class="align-top">{{ $item->nmKegiatan }}</td>
-                                                <td class="align-top">{{ number_format($normalisasi['anggaran'], 10) }}
-                                                </td>
-                                                <td class="align-top">
-                                                    {{ number_format($normalisasi['tingkat_risiko'], 10) }}</td>
-
-                                                <td class="align-top">{{ $item->uraianDampak }}</td>
-                                                <td class="align-top">{{ $item->Resiko }}</td>
-                                                <td class="align-top">{{ $item->pernyataanRisiko }}</td>
-                                                <td class="align-top">{{ $item->pengendalian }}</td>
-                                            </tr>
-                                        @empty
-                                            <div class="alert alert-danger">
-                                                Data Hasil Normalisasi belum Tersedia
-                                            </div>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                                {{ $petaCleaneds->links('pagination::bootstrap-4') }}
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Hasil Cluster --}}
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card border-0 shadow rounded">
-                            <div class="card-header">
-                                <h5>Hasil Cluster Peta Risiko</h5>
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr class="text-center">
-                                            <th>No</th>
-                                            <th>Nama Unit</th>
-                                            <th>IKU</th>
-                                            <th>Judul</th>
-                                            <th>Anggaran</th>
-                                            <th>Skor Probabilitas</th>
-                                            <th>Skor Dampak</th>
-                                            <th>Uraian</th>
-                                            <th>Resiko</th>
-                                            <th>Pernyataan</th>
-                                            <th>Pengendalian</th>
-                                            <th>Cluster</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($petaCleaneds as $index => $item)
-                                            @php
-                                                $transform = json_decode($item->preprocessing->transform, true);
-                                            @endphp
-                                            <tr>
-                                                <td class="align-top">
-                                                    {{ ($petaCleaneds->currentPage() - 1) * $petaCleaneds->perPage() + $index + 1 }}
-                                                </td>
-                                                <td class="align-top">{{ $item->nmUnit }}</td>
-                                                <td class="align-top">{{ $item->iku }}
-                                                </td>
-                                                <td class="align-top">{{ $item->nmKegiatan }}</td>
-                                                <td class="align-top">{{ $item->nilRabUsulan }}
-                                                </td>
-                                                <td class="align-top">{{ number_format($transform['probaBilitas']) }}
-                                                </td>
-                                                <td class="align-top">{{ number_format($transform['dampak']) }}
-                                                </td>
-
-                                                <td class="align-top">{{ $item->uraianDampak }}</td>
-                                                <td class="align-top">{{ $item->Resiko }}</td>
-                                                <td class="align-top">{{ $item->pernyataanRisiko }}</td>
-                                                <td class="align-top">{{ $item->pengendalian }}</td>
-                                                <td class="align-top text-center">{{ $item->cluster->cluster }}</td>
-                                            </tr>
-                                        @empty
-                                            <div class="alert alert-danger">
-                                                Data Hasil Cluster Peta Risio belum Tersedia
-                                            </div>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                                {{ $petaCleaneds->links('pagination::bootstrap-4') }}
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
 
                 {{-- Interpretasi Cluster --}}
                 <div class="row">
