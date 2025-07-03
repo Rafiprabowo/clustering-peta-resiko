@@ -45,20 +45,33 @@ class MenuData extends Seeder
         'id_head_menu' => null,
     ],
     [
-    'id' => 6,
-    'name' => 'Analisis Peta Risiko',
-    'link' => '/analisis/petas',
-    'icon' => 'fas fa-chart-pie', // Tetap
-    'id_head_menu' => 1,
+        'id' => 5,
+        'name' => 'Clustering',
+        'link' => '/clustering-peta-risiko',
+        'icon' => 'fas fa-chart-simple',
+        'id_head_menu' => 1,
     ],
     [
-        'id' => 7,
+        'id' => 6,
+        'name' => 'Hasil Cluster',
+        'link' => '/analisis/petas',
+        'icon' => 'fas fa-chart-pie', // Tetap
+        'id_head_menu' => 1,
+    ],
+    [
+        'id' => 11,
         'name' => 'Data Peta Risiko',
         'link' => '/petas',
         'icon' => 'fas fa-table', // Ganti jadi icon data/table
         'id_head_menu' => 1,
     ],
-
+     [
+        'id' => 7,
+        'name' => 'Visualisasi Cluster',
+        'link' => '/visualisasi',
+        'icon' => 'fas fa-user',
+        'id_head_menu' => 1,
+    ],
     [
         'id' => 8,
         'name' => 'Dokumen Reviu',

@@ -55,7 +55,7 @@ class PetaController extends Controller
 
     public function index(Request $request, TugasLaporChart $tugasLaporChart)
     {
-        $active = 7;
+        $active = 11;
         //get user data yang sedang login
         $users = User::where('id', Auth::user()->id)->with('unitKerja')->first();
 
@@ -261,7 +261,7 @@ class PetaController extends Controller
 
     // public function index(Request $request, TugasLaporChart $tugasLaporChart)
     // {
-    //     $active = 7;
+    //     $active = 11;
     //     $users = User::where('id', Auth::user()->id)->with('unitKerja')->first();
 
     //     $query = Peta::query();
@@ -349,7 +349,7 @@ class PetaController extends Controller
 
     // public function tabelUnitKerja(Request $request, $unitKerja)
     // {
-    //     $active = 7;
+    //     $active = 11;
     //     $tahun = $request->input('tahun');
     //     $petas = Peta::where('jenis', $unitKerja)
     //         ->when($tahun, function ($query, $tahun) {
@@ -370,7 +370,7 @@ class PetaController extends Controller
 
     public function tabelUnitKerja(Request $request, $unitKerja)
     {
-        $active = 7;
+        $active = 11;
         $tahun = $request->input('tahun');
         $petas = Peta::where('jenis', $unitKerja)
             ->when($tahun, function ($query, $tahun) {
@@ -446,7 +446,7 @@ class PetaController extends Controller
 
     // public function searchPetaRisiko(Request $request)
     // {
-    //     $active = 7;
+    //     $active = 11;
     //     $search = $request->input('search');
     //     $selectedYear = $request->input('year', date('Y')); // Ambil tahun dari inputan filter atau default ke tahun saat ini
     //     $user = Auth::user();
@@ -522,7 +522,7 @@ class PetaController extends Controller
 
     public function searchPetaRisiko(Request $request)
     {
-        $active = 7;
+        $active = 11;
         $search = $request->input('search');
         $selectedYear = $request->input('year', date('Y'));
         $user = Auth::user();
@@ -613,7 +613,7 @@ class PetaController extends Controller
 
     // public function tabelMatrik(Request $request)
     // {
-    //     $active = 7;
+    //     $active = 11;
     //     $tahun = $request->input('tahun');
     //     $petas = Peta::when($tahun, function ($query, $tahun) {
     //         return $query->whereYear('created_at', $tahun);
@@ -633,7 +633,7 @@ class PetaController extends Controller
 
     public function tabelMatrik(Request $request)
     {
-        $active = 7;
+        $active = 11;
         $tahun = $request->input('tahun');
         $petas = Peta::when($tahun, function ($query, $tahun) {
             return $query->whereYear('created_at', $tahun);
@@ -699,7 +699,7 @@ class PetaController extends Controller
 
     public function create()
     {
-        $active = 7;
+        $active = 11;
         $unitKerjas = UnitKerja::all();
         $post = Post::all();
         if (Auth::user()->id_level == 1 || Auth::user()->id_level == 2) {
@@ -717,7 +717,7 @@ class PetaController extends Controller
 
     public function edit($id)
     {
-        $active = 7;
+        $active = 11;
         $unitKerjas = UnitKerja::all();
         $post = Post::all();
         $kegiatan = Kegiatan::all();
@@ -813,7 +813,7 @@ class PetaController extends Controller
 
     public function update(Request $request, $id)
     {
-        $active = 7;
+        $active = 11;
         // dd($request->all());
         //validate form
         $this->validate($request, [
@@ -928,7 +928,7 @@ class PetaController extends Controller
 
     public function tugas($jenis)
     {
-        $active = 7;
+        $active = 11;
         // Cari data berdasarkan jenis (unit kerja)
         $peta = Peta::where('jenis', $jenis)->firstOrFail();
 
@@ -988,7 +988,7 @@ class PetaController extends Controller
 
     public function tambahAnggota($jenis)
     {
-        $active = 7;
+        $active = 11;
         // Cari data berdasarkan jenis (unit kerja)
         $peta = Peta::where('jenis', $jenis)->firstOrFail();
 
@@ -1020,7 +1020,7 @@ class PetaController extends Controller
 
     public function detailPR($id)
     {
-        $active = 7;
+        $active = 11;
         $petas = Peta::with('ketuaPenelaah')->findOrFail($id);
         // $unit_kerja = UnitKerja::all();
         // $comment_prs = $petas->comment_prs()->with('user')->latest()->get();
@@ -1449,7 +1449,7 @@ class PetaController extends Controller
     //detail per jenis
     public function detailByJenis(Request $request, $jenis)
     {
-        $active = 7;
+        $active = 11;
         $search = $request->input('search');
 
         // Buat query dasar dengan join ke tabel kegiatan
@@ -1751,7 +1751,7 @@ class PetaController extends Controller
 
     public function penelaahPeta()
     {
-        $active = 7;
+        $active = 11;
         $unitKerjas = UnitKerja::all();
         $users = User::whereNot('id_level', 5)->get();
         return view('pr.penelaahPeta', compact('active', 'unitKerjas', 'users'));
@@ -1784,7 +1784,7 @@ class PetaController extends Controller
     }
 
     public function identifikasiRisiko($tahun){
-        $active = 7;
+        $active = 11;
 
         $jenis = Peta::select('jenis')
             ->whereYear('created_at', $tahun)
@@ -1803,8 +1803,6 @@ public function exportPdfIdentifikasiRisiko($jenis, $tahun)
     $data = Peta::where('jenis', $jenis)
         ->whereYear('created_at', $tahun)
         ->get();
-
-
 
     // Transformasi data untuk ditampilkan
     $selectedAtr = $data->map(function($item) {
@@ -2001,7 +1999,7 @@ for ($i = 1; $i <= count($headers); $i++) {
         ->whereYear('created_at', $tahun)
         ->get();
 
-    $row = $startRow + 2; // Mulai data dari baris ke-7
+    $row = $startRow + 2; // Mulai data dari baris ke-11
     foreach ($data as $i => $d) {
         $probabilitas = match ($d->skor_kemungkinan) {
             1 => 'Sangat Jarang',

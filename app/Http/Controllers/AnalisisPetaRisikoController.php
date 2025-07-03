@@ -17,40 +17,35 @@ use function PHPUnit\Framework\returnSelf;
 class AnalisisPetaRisikoController extends Controller
 {
 
-    public function index(Request $request)
+public function index(Request $request)
 {
     $active = 6;
 
-    // Ambil list tahun
+    // Ambil list tahun dari relasi clustering_run (lebih konsisten)
     $years = ClusteringRun::selectRaw('YEAR(created_at) as year')
         ->distinct()
         ->orderByDesc('year')
         ->pluck('year');
 
-    // Ambil input filter
     $selectedYear = $request->tahun;
 
-    // Ambil data jenisCount langsung tanpa ambil ClusteringRun dulu
-    $jenisCount = PetaCleaned::select(
-            'peta_cleaneds.nmUnit',
-            DB::raw('COUNT(*) as total'),
-            DB::raw('YEAR(peta_cleaneds.created_at) as tahun'),
-            'clustering_runs.nama_file'
-        )
-        ->join('clustering_runs', 'peta_cleaneds.id_clustering_run', '=', 'clustering_runs.id')
+    // Ambil data PetaCleaned dengan relasi
+    $hasilClusterings = PetaCleaned::with(['preprocessing', 'cluster', 'clusteringRun'])
         ->when($selectedYear, function ($query, $selectedYear) {
-            $query->whereYear('peta_cleaneds.created_at', $selectedYear);
+            $query->whereYear('created_at', $selectedYear);
         })
-        ->groupBy(
-            'peta_cleaneds.nmUnit',
-            DB::raw('YEAR(peta_cleaneds.created_at)'),
-            'clustering_runs.nama_file'
-        )
-        ->orderBy('peta_cleaneds.nmUnit')
-        ->paginate(5);
+        ->orderBy('nmUnit')
+        ->paginate(10);
 
-    return view('analisisPR.index', compact('active', 'years', 'selectedYear', 'jenisCount'));
+    return view('analisisPR.index', compact(
+        'active',
+        'years',
+        'selectedYear',
+        'hasilClusterings'
+    ));
 }
+
+
 
 
     public function detailAnalisisPeta($unit, $tahun, $file){

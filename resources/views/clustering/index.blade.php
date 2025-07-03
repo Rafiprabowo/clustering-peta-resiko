@@ -4,7 +4,7 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header d-flex align-items-center">
-                <a href="{{ route('analisisPr.index') }}" class="mr-3"><i class="fas fa-arrow-left" style="font-size: 1.3rem"></i></a>
+                <a href="{{ url('/') }}" class="mr-3"><i class="fas fa-arrow-left" style="font-size: 1.3rem"></i></a>
                 <h1>Riwayat Clustering</h1>
             </div>
             <div class="section-body">
@@ -14,21 +14,10 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-6 mb-1">
-                                        {{-- @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
-                                            <a href="{{ route('petas.create') }}" class="btn btn-md btn-success mb-1">TAMBAH
-                                                PETA</a>
-                                        @endif --}}
-
-                                        @if (auth()->user()->id_level == 1 || auth()->user()->id_level == 2)
-                                            <a href="{{ url('/clustering/prediksi') }}"
-                                                class="btn btn-outline-primary mb-1">
-                                                <i class="fas fa-magnifying-glass-plus"></i> Buat Prediksi
-                                            </a>
-
-                                            <a href="{{ url('/analisis/petas') }}" class="btn btn-primary mb-1">
-                                                Analisis Peta Risiko
-                                            </a>
-                                        @endif
+                                        <a href="{{ route('clustering-peta-risiko.prediksi') }}"
+                                            class="btn btn-outline-primary mb-1">
+                                            <i class="fas fa-magnifying-glass-plus"></i> Buat Prediksi
+                                        </a>
 
                                     </div>
                                 </div>
@@ -40,7 +29,7 @@
                                             <th>Metode</th>
                                             <th>Akurasi</th>
                                             <th>Waktu Clustering</th>
-                                            <th>Aksi</th>
+                                            <th>Download Hasil</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -52,17 +41,25 @@
                                                 <td class="text-center">{{ $item->silhouette_score }}</td>
                                                 <td class="text-center">{{ $item->created_at }}</td>
                                                 <td class="text-center">
+                                                    <a href="{{ route('clustering.download', $item->id) }}"
+                                                        class="btn btn-danger p-2 text-white" data-toggle="tooltip"
+                                                        title="Download PDF">
+                                                        <i class="fas fa-file-pdf"></i>
+                                                    </a>
+                                                </td>
+                                                {{-- <td class="text-center">
                                                     <a href="{{ route('clustering.detail', ['id' => $item->id]) }}"
                                                         class="btn btn-success p-2 text-white" data-toggle="tooltip"
                                                         title="Detail Clustering">
                                                         <i class="fas fa-project-diagram"></i>
                                                     </a>
+
                                                     <a href="{{ route('clustering.detailVisualisasi', ['id' => $item->id]) }}"
                                                         class="btn btn-primary p-2 text-white" data-toggle="tooltip"
                                                         title="Visualisasi Hasil Clustering">
                                                         <i class="fas fa-chart-simple"></i>
                                                     </a>
-                                                </td>
+                                                </td> --}}
                                             </tr>
                                         @empty
                                             <div class="alert alert-danger">

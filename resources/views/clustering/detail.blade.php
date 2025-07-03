@@ -4,7 +4,8 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header d-flex align-items-center">
-                <a href="{{ route('analisisPr.index') }}" class="mr-3"><i class="fas fa-arrow-left" style="font-size: 1.3rem"></i></a>
+                <a href="{{ route('analisisPr.index') }}" class="mr-3"><i class="fas fa-arrow-left"
+                        style="font-size: 1.3rem"></i></a>
                 <h1>Detail Clustering </h1>
             </div>
             <div class="section-body">
@@ -71,55 +72,15 @@
                     <div class="col-md-12">
                         <div class="card border-0 shadow rounded">
                             <div class="card-header">
-                                <h5>Interpretasi Cluster</h5>
+                                <h5>Grafik Centroid </h5>
                             </div>
                             <div class="card-body">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr class="text-center">
-                                            <th>No</th>
-                                            <th>Nama File</th>
-                                            <th>Cluster</th>
-                                            <th>Centroid Skor IKU</th>
-                                            <th>Centroid Skor Anggaran</th>
-                                            <th>Centroid Skor Tingkat Risiko</th>
-                                            <th>Interpretasi</th>
-                                            <th>Rekomendasi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse ($clusteringRun->interpretasi as $interpret)
-                                            @php
-                                                $centroid = $interpret->centroid;
-                                            @endphp
-                                            <tr class="text-center">
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $clusteringRun->nama_file }}</td>
-                                                <td>Cluster {{ $interpret->cluster }}</td>
-                                                <td>{{ number_format($centroid['skor_iku']) }}</td>
-                                                <td>{{ number_format($centroid['anggaran']) }}</td>
-                                                <td>{{ number_format($centroid['tingkat_risiko']) }}</td>
-                                                <td>{{ $interpret->interpretasi }}</td>
-                                                <td>—</td> {{-- Jika nanti ada rekomendasi bisa ditambahkan di sini --}}
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="8">
-                                                    <div class="alert alert-danger text-center mb-0">
-                                                        Data Interpretasi Cluster belum tersedia.
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-
-                                </table>
-
+                                @livewire('interpretasi-chart', ['clusteringRunId' => $clusteringRun->id])
                             </div>
-
                         </div>
                     </div>
                 </div>
+
             </div>
         </section>
     </div>

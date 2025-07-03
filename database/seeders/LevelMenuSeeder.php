@@ -32,10 +32,10 @@ class LevelMenuSeeder extends Seeder
                 'id_level' => '1',
                 'id_menu' => '4',
             ],
-            // [
-            //     'id_level' => '1',
-            //     'id_menu' => '5',
-            // ],
+            [
+                'id_level' => '1',
+                'id_menu' => '5',
+            ],
 
             [
                 'id_level' => '1',
@@ -57,6 +57,10 @@ class LevelMenuSeeder extends Seeder
             [
                 'id_level' => '1',
                 'id_menu' => '10',
+            ],
+            [
+                'id_level' => '1',
+                'id_menu' => '11',
             ],
             [
                 'id_level' => '1',
@@ -89,10 +93,10 @@ class LevelMenuSeeder extends Seeder
                 'id_level' => '2',
                 'id_menu' => '4',
             ],
-            // [
-            //     'id_level' => '2',
-            //     'id_menu' => '5',
-            // ],
+            [
+                'id_level' => '2',
+                'id_menu' => '5',
+            ],
             [
                 'id_level' => '2',
                 'id_menu' => '6',
@@ -108,6 +112,10 @@ class LevelMenuSeeder extends Seeder
             [
                 'id_level' => '2',
                 'id_menu' => '10',
+            ],
+            [
+                'id_level' => '2',
+                'id_menu' => '11',
             ],
             [
                 'id_level' => '2',
@@ -133,13 +141,21 @@ class LevelMenuSeeder extends Seeder
                 'id_level' => '3',
                 'id_menu' => '4',
             ],
-            // [
-            //     'id_level' => '3',
-            //     'id_menu' => '5',
-            // ],
+            [
+                'id_level' => '3',
+                'id_menu' => '5',
+            ],
+            [
+                'id_level' => '3',
+                'id_menu' => '6',
+            ],
             [
                 'id_level' => '3',
                 'id_menu' => '7',
+            ],
+            [
+                'id_level' => '3',
+                'id_menu' => '11',
             ],
             [
                 'id_level' => '3',
@@ -161,13 +177,21 @@ class LevelMenuSeeder extends Seeder
                 'id_level' => '4',
                 'id_menu' => '4',
             ],
-            // [
-            //     'id_level' => '4',
-            //     'id_menu' => '5',
-            // ],
+            [
+                'id_level' => '4',
+                'id_menu' => '5',
+            ],
+             [
+                'id_level' => '4',
+                'id_menu' => '6',
+            ],
             [
                 'id_level' => '4',
                 'id_menu' => '7',
+            ],
+             [
+                'id_level' => '4',
+                'id_menu' => '11',
             ],
             [
                 'id_level' => '4',
@@ -217,13 +241,21 @@ class LevelMenuSeeder extends Seeder
                 'id_level' => '6',
                 'id_menu' => '4',
             ],
-            // [
-            //     'id_level' => '6',
-            //     'id_menu' => '5',
-            // ],
+            [
+                'id_level' => '6',
+                'id_menu' => '5',
+            ],
+            [
+                'id_level' => '6',
+                'id_menu' => '6',
+            ],
             [
                 'id_level' => '6',
                 'id_menu' => '7',
+            ],
+             [
+                'id_level' => '6',
+                'id_menu' => '11',
             ],
             [
                 'id_level' => '6',

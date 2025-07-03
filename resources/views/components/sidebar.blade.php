@@ -31,18 +31,19 @@
                         @php
                             $isActiveParent = false;
                             foreach ($item->Menu as $menu) {
-                                if (Request::is(ltrim($menu->link, '/'))) {
+                                $pattern = ltrim($menu->link, '/');
+                                if (Request::is($pattern) || Request::is($pattern . '/*')) {
                                     $isActiveParent = true;
                                     break;
                                 }
                             }
                         @endphp
                         <li class="nav-item dropdown {{ $isActiveParent ? 'active' : '' }}">
-                            <a href="#" class="nav-link has-dropdown">
+                            <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
                                 <i class="nav-icon {{ $item->icon }}"></i>
                                 <span>{{ $item->name }}</span>
                             </a>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu {{ $isActiveParent ? 'show' : '' }}">
                                 @foreach ($item->Menu as $menu)
                                     @if ($menu->Level_menu->pluck('id_level')->contains(auth()->user()->id_level))
                                         <li class="{{ Request::is(ltrim($menu->link, '/')) ? 'active' : '' }}">

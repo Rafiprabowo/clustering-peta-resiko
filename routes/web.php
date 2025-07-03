@@ -25,6 +25,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\RTMController;
 use App\Http\Controllers\ImportedExcelController;
+use App\Http\Controllers\VisualisasiClusterController;
 use App\Imports\PetaRisikoImport;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Route;
@@ -213,15 +214,22 @@ Route::prefix('/analisis/petas')->group(function(){
     Route::get('/detailPR/{id}', [AnalisisPetaRisikoController::class, 'detailPR'])->name('analisisPr.detailPR');
 });
 
-Route::prefix('clustering')->group(function(){
-    Route::get('/', [ClusteringController::class, 'index'])->name('clustering.index')->middleware('auth');
+Route::prefix('clustering-peta-risiko')->group(function(){
+    Route::get('/', [ClusteringController::class, 'index'])->name('clustering-peta-risiko.index')->middleware('auth');
     Route::get('/detailClustering/{id}', [ClusteringController::class, 'detail'])->name('clustering.detail')->middleware('auth');
-     Route::get('/visualisasi/{id}', [ClusteringController::class, 'detailVisualisasi'])->name('clustering.detailVisualisasi')->middleware('auth');
-    Route::get('/PR/detail/{id}', [ClusteringController::class, 'detailPR'])->name('clustering.detailPR')->middleware('auth');
+    Route::get('/prediksi', [ClusteringController::class, 'buatPrediksi'])->middleware('auth')->name('clustering-peta-risiko.prediksi');
+    Route::post('/prediksi', [ClusteringController::class, 'prosesPrediksi'])->middleware('auth')->name('clustering-peta-risiko.predict');
+    Route::get('/visualisasi/{id}', [ClusteringController::class, 'detailVisualisasi'])->name('clustering.detailVisualisasi')->middleware('auth');
+    Route::get('/download/{id}', [ClusteringController::class, 'downloadPdf'])->name('clustering.download');
 
-    Route::get('/prediksi', [ClusteringController::class, 'buatPrediksi'])->middleware('auth');
-    Route::post('/prediksi', [ClusteringController::class, 'prosesPrediksi'])->middleware('auth');
+
+})->middleware('auth');
+
+Route::prefix('/visualisasi')->group(function(){
+    Route::get('/', [VisualisasiClusterController::class, 'index'])->name('visualisasi.index')->middleware('auth');
 });
+
+
 
 
 //Route CRUD User
