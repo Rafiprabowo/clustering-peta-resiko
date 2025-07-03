@@ -39,9 +39,12 @@ public function downloadPdf($id)
     $clusteringRun = ClusteringRun::findOrFail($id);
 
     $petaCleaneds = PetaCleaned::with(['cluster.interpretasi', 'preprocessing'])
-        ->where('id_clustering_run', $clusteringRun->id)
-        ->orderBy('nmUnit', 'asc')
-        ->get();
+        ->where('peta_cleaneds.id_clustering_run', $clusteringRun->id)
+        ->join('cluster_petas', 'peta_cleaneds.id', '=', 'cluster_petas.id_peta_cleaned')
+        ->orderBy('cluster_petas.cluster', 'asc') // Ganti 'nama_cluster' dengan kolom di cluster_petas
+        ->get(['peta_cleaneds.*']);
+
+
 
     // Pie Chart 1: Total Kegiatan per Cluster
     $totalPerCluster = $petaCleaneds->groupBy('cluster.cluster')
@@ -136,7 +139,7 @@ public function downloadPdf($id)
         ]);
 
     $filename = 'Hasil_Clustering_' . $clusteringRun->nama_file . '.pdf';
-    return $pdf->download($filename);
+    return $pdf->stream($filename);
 }
 
 
