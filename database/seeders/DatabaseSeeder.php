@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
+        $this->call(HeadMenuSeeder::class);
         $this->call(MenuData::class);
         $this->call(LevelSeeder::class);
         $this->call(LevelMenuSeeder::class);
@@ -28,5 +29,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ManagementPengawasanSeeder::class);
         $this->call(JenisKegiatanSeeder::class);
         $this->call(MasterIkuData::class);
+
     }
 }

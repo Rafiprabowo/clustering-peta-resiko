@@ -28,38 +28,71 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        View::composer('*', function($view)
-        {
+        // View::composer('*', function($view)
+        // {
 
-            View::share('user', auth()->user());
+        //     View::share('user', auth()->user());
 
-            if(auth()->check()){
-                $level_menus = Level_menu::where('id_level', auth()->user()->id_level)->get();
-                $first = Menu::first();
-                $menus = Menu::get();
-                // $panel_menus[] = null;
-                foreach($menus as $menu){
-                    foreach ($level_menus->skip(1) as $level_menu) {
-                        if ($menu->id == $level_menu->id_menu) {
-                            if($menu->id_head_menu == null){
-                                $panel_menus[] = $menu;
-                            }
-                        }
-                    }
-                };
+        //     if(auth()->check()){
+        //         $level_menus = Level_menu::where('id_level', auth()->user()->id_level)->get();
+        //         $first = Menu::first();
+        //         $menus = Menu::get();
+        //         // $panel_menus[] = null;
+        //         foreach($menus as $menu){
+        //             foreach ($level_menus->skip(1) as $level_menu) {
+        //                 if ($menu->id == $level_menu->id_menu) {
+        //                     if($menu->id_head_menu == null){
+        //                         $panel_menus[] = $menu;
+        //                     }
+        //                 }
+        //             }
+        //         };
 
-                $head_menus = Head_menu::get();
+        //         $head_menus = Head_menu::get();
 
-                View::share([
-                    'first_menu' =>$first,
-                    'panel_menus' =>$panel_menus,
-                    'head_menus' =>$head_menus,
-                    'level_menus' => $level_menus
-                ]);
+        //         View::share([
+        //             'first_menu' =>$first,
+        //             'panel_menus' =>$panel_menus,
+        //             'head_menus' =>$head_menus,
+        //             'level_menus' => $level_menus
+        //         ]);
+        //     }
+
+
+        // });
+
+        View::composer('*', function($view) {
+    View::share('user', auth()->user());
+
+    if(auth()->check()) {
+        $level_menus = Level_menu::where('id_level', auth()->user()->id_level)->get();
+        $first = Menu::first();
+
+        // Ambil menu sesuai level
+        $menus = Menu::with('Level_menu')->get();
+        $panel_menus = collect();
+        foreach($menus as $menu) {
+            if ($menu->id_head_menu == null) {
+                $allowed = $menu->Level_menu->pluck('id_level')->contains(auth()->user()->id_level);
+                if ($allowed) $panel_menus->push($menu);
             }
+        }
 
+        $head_menus = Head_menu::with(['Menu.Level_menu'])->get();
 
-        });
+        // Urutkan: panel sampai RTM, lalu head menu, lalu sisanya
+        $merged_menus = collect();
+
+        $merged_menus = $merged_menus->concat($panel_menus->where('id', '<=', 4));
+        $merged_menus = $merged_menus->concat($head_menus);
+        $merged_menus = $merged_menus->concat($panel_menus->where('id', '>', 4));
+
+        View::share([
+            'first_menu' => $first,
+            'merged_menus' => $merged_menus,
+        ]);
+    }
+});
 
 
     }
