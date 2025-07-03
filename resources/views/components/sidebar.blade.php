@@ -28,7 +28,16 @@
                     @endphp
 
                     @if ($count > 0)
-                        <li class="nav-item dropdown">
+                        @php
+                            $isActiveParent = false;
+                            foreach ($item->Menu as $menu) {
+                                if (Request::is(ltrim($menu->link, '/'))) {
+                                    $isActiveParent = true;
+                                    break;
+                                }
+                            }
+                        @endphp
+                        <li class="nav-item dropdown {{ $isActiveParent ? 'active' : '' }}">
                             <a href="#" class="nav-link has-dropdown">
                                 <i class="nav-icon {{ $item->icon }}"></i>
                                 <span>{{ $item->name }}</span>

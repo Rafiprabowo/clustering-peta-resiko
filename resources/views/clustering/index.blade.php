@@ -4,7 +4,7 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header d-flex align-items-center">
-                <a href="{{ url()->previous() }}" class="mr-3"><i class="fas fa-arrow-left" style="font-size: 1.3rem"></i></a>
+                <a href="{{ route('analisisPr.index') }}" class="mr-3"><i class="fas fa-arrow-left" style="font-size: 1.3rem"></i></a>
                 <h1>Riwayat Clustering</h1>
             </div>
             <div class="section-body">
@@ -54,7 +54,7 @@
                                                 <td class="text-center">
                                                     <a href="{{ route('clustering.detail', ['id' => $item->id]) }}"
                                                         class="btn btn-success p-2 text-white" data-toggle="tooltip"
-                                                        title="Detail Proses Clustering">
+                                                        title="Detail Clustering">
                                                         <i class="fas fa-project-diagram"></i>
                                                     </a>
                                                     <a href="{{ route('clustering.detailVisualisasi', ['id' => $item->id]) }}"

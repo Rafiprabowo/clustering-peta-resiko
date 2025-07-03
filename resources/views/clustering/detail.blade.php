@@ -4,12 +4,12 @@
     <div class="main-content">
         <section class="section">
             <div class="section-header d-flex align-items-center">
-                <a href="{{ url()->previous() }}" class="mr-3"><i class="fas fa-arrow-left" style="font-size: 1.3rem"></i></a>
+                <a href="{{ route('analisisPr.index') }}" class="mr-3"><i class="fas fa-arrow-left" style="font-size: 1.3rem"></i></a>
                 <h1>Detail Clustering </h1>
             </div>
             <div class="section-body">
                 <h4 class="tittle-1">
-                    <span class="span0">Nama File : {{  $clusteringRun->nama_file }}</span>
+                    <span class="span0">Nama File : {{ $clusteringRun->nama_file }}</span>
                     {{-- <span class="span1">{{ $jenis }}</span> --}}
                 </h4>
 
@@ -17,9 +17,12 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card border-0 shadow rounded">
-                            <div class="card-header">
-                                <h5>Data Peta Risiko</h5>
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Data Peta Risiko</h5>
+                                <span class="badge badge-primary">Total: {{ $totalPetaRisiko }}</span>
                             </div>
+
+
                             <div class="card-body">
                                 <table class="table table-bordered">
                                     <thead>

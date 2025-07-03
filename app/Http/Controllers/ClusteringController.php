@@ -49,7 +49,8 @@ class ClusteringController extends Controller
         // Ambil peta cleaned + relasi (kalau mau sekalian)
         $petaCleaneds = $clusteringRun->petaCleaneds()->orderBy('nmUnit', 'asc')->with(['preprocessing', 'cluster.interpretasi'])->paginate(5);
 
-        return view('clustering.detail', compact('active', 'clusteringRun', 'petaCleaneds'));
+        $totalPetaRisiko = PetaCleaned::count();
+        return view('clustering.detail', compact('active', 'clusteringRun', 'petaCleaneds', 'totalPetaRisiko'));
     }
 
 public function detailVisualisasi($id, Request $request)
