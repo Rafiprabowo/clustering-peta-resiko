@@ -161,10 +161,6 @@
         </tbody>
     </table>
 
-    {{-- ...tutup tabel sebelumnya --}}
-    </table>
-
-    {{-- Page break opsional --}}
 
    <div style="page-break-before: always;"></div>
 

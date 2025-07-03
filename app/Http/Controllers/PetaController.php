@@ -2312,7 +2312,7 @@ public function exportPdfAll()
     ])->setPaper('a4', 'landscape')->setOptions([
         'isHtml5ParserEnabled' => true,
         'isRemoteEnabled' => true
-    ])->stream("Peta_Risiko_Semua_Unit_2025.pdf");
+    ])->download("Peta_Risiko_Semua_Unit_2025.pdf");
 }
 
 
