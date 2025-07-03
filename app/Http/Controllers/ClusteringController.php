@@ -136,7 +136,7 @@ public function downloadPdf($id)
         ]);
 
     $filename = 'Hasil_Clustering_' . $clusteringRun->nama_file . '.pdf';
-    return $pdf->stream($filename);
+    return $pdf->download($filename);
 }
 
 
