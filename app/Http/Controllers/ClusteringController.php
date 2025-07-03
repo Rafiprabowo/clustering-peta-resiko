@@ -273,8 +273,8 @@ public function detailVisualisasi($id, Request $request)
                     $index = $pre['index_cleaned'];
                     PreprocessingPeta::create([
                         'id_peta_cleaned' => $cleanedIdMap[$index],
-                        'transform' => json_encode($pre['transform']),
-                        'normalisasi' => json_encode($pre['normalisasi']),
+                        'transform' => $pre['transform'],
+                        'normalisasi' => $pre['normalisasi'],
                     ]);
                 }
 
@@ -292,7 +292,7 @@ public function detailVisualisasi($id, Request $request)
                     InterpretasiCluster::create([
                         'id_clustering_run' => $clusteringRun->id,
                         'cluster' => $interpret['cluster'],
-                        'centroid' => json_encode($interpret['centroid']),
+                        'centroid' => $interpret['centroid'],
                         'interpretasi' => $interpret['interpretasi'],
                     ]);
                 }
