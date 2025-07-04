@@ -18,7 +18,6 @@
                                             class="btn btn-outline-primary mb-1">
                                             <i class="fas fa-magnifying-glass-plus"></i> Buat Prediksi
                                         </a>
-
                                     </div>
                                 </div>
                                 <table class="table table-bordered">
@@ -30,6 +29,7 @@
                                             <th>Akurasi</th>
                                             <th>Waktu Clustering</th>
                                             <th>Download Hasil</th>
+                                            <th>Hapus</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -42,29 +42,36 @@
                                                 <td class="text-center">{{ $item->created_at }}</td>
                                                 <td class="text-center">
                                                     <a href="{{ route('clustering.download', $item->id) }}"
-                                                        class="btn btn-danger p-2 text-white" data-toggle="tooltip"
-                                                        title="Download PDF">
-                                                        <i class="fas fa-file-pdf"></i>
-                                                    </a>
-                                                </td>
-                                                {{-- <td class="text-center">
-                                                    <a href="{{ route('clustering.detail', ['id' => $item->id]) }}"
-                                                        class="btn btn-success p-2 text-white" data-toggle="tooltip"
-                                                        title="Detail Clustering">
-                                                        <i class="fas fa-project-diagram"></i>
+                                                        class="btn btn-sm btn-danger py-1 px-2 text-white"
+                                                        data-toggle="tooltip" title="Download PDF">
+                                                        Export <i class="fas fa-file-pdf"></i>
                                                     </a>
 
-                                                    <a href="{{ route('clustering.detailVisualisasi', ['id' => $item->id]) }}"
-                                                        class="btn btn-primary p-2 text-white" data-toggle="tooltip"
-                                                        title="Visualisasi Hasil Clustering">
-                                                        <i class="fas fa-chart-simple"></i>
-                                                    </a>
-                                                </td> --}}
+                                                </td>
+                                                <td class="text-center">
+                                                    <form action="{{ route('clustering.delete', $item->id) }}"
+                                                        method="POST"
+                                                        onsubmit="return confirm('Yakin ingin menghapus data clustering ini?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-danger py-1 px-2"
+                                                            data-toggle="tooltip" title="Hapus Data">
+                                                            <i class="fas fa-trash-alt fa-lg"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+
+
+
                                             </tr>
                                         @empty
-                                            <div class="alert alert-danger">
-                                                Data Clustering Peta Risiko belum Tersedia
-                                            </div>
+                                            <tr>
+                                                <td colspan="7" class="text-center">
+                                                    <div class="alert alert-danger m-0">
+                                                        Data Clustering Peta Risiko belum Tersedia
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         @endforelse
                                     </tbody>
                                 </table>
@@ -75,4 +82,36 @@
             </div>
         </section>
     </div>
+
+    <!-- Modal Hapus Berhasil -->
+    <div class="modal fade" id="hapusBerhasilModal" tabindex="-1" role="dialog" aria-labelledby="hapusBerhasilLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="hapusBerhasilLabel">Berhasil</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    Data clustering berhasil dihapus!
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@section('scripts')
+    <!-- jQuery & Bootstrap Bundle (if not already loaded) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    @if (session('success'))
+        <script>
+            $(document).ready(function() {
+                $('#hapusBerhasilModal').modal('show');
+            });
+        </script>
+    @endif
 @endsection

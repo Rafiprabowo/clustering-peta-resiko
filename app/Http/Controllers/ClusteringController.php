@@ -142,6 +142,13 @@ public function downloadPdf($id)
     return $pdf->stream($filename);
 }
 
+    public function destroy($id)
+{
+    $clustering = ClusteringRun::findOrFail($id);  // Ganti ClusteringModel dengan nama model kamu
+    $clustering->delete();
+
+    return redirect()->back()->with('success', 'Data clustering berhasil dihapus.');
+}
 
 
     public function detail($id)

@@ -221,7 +221,7 @@ Route::prefix('clustering-peta-risiko')->group(function(){
     Route::post('/prediksi', [ClusteringController::class, 'prosesPrediksi'])->middleware('auth')->name('clustering-peta-risiko.predict');
     Route::get('/visualisasi/{id}', [ClusteringController::class, 'detailVisualisasi'])->name('clustering.detailVisualisasi')->middleware('auth');
     Route::get('/download/{id}', [ClusteringController::class, 'downloadPdf'])->name('clustering.download');
-
+    Route::delete('/{id}', [ClusteringController::class, 'destroy'])->name('clustering.delete')->middleware('auth');
 
 })->middleware('auth');
 
