@@ -5,7 +5,8 @@
                 <select wire:model="fileId" class="form-control mr-2">
                     <option value="">Pilih File Clustering</option>
                     @foreach ($files as $file)
-                        <option value="{{ $file->id }}">{{ $file->nama_file }} ({{ \Carbon\Carbon::parse($file->created_at)->format('Y') }})</option>
+                        <option value="{{ $file->id }}">{{ $file->nama_file }} </option>
+                        {{-- ({{ \Carbon\Carbon::parse($file->created_at)->format('Y') }}) --}}
                     @endforeach
                 </select>
 
@@ -54,7 +55,7 @@
                     <td class="text-right">{{ number_format($item->nilRabUsulan, 0, ',', '.') }}</td>
                     <td class="text-center">{{ $item->preprocessing->transform['dampak'] ?? '-' }}</td>
                     <td class="text-center">{{ $item->preprocessing->transform['probaBilitas'] ?? '-' }}</td>
-                    <td class="text-center">{{ $item->preprocessing->normalisasi['tingkat_risiko'] ?? '-' }}</td>
+                    <td class="text-center">{{ $item->preprocessing->transform['tingkat_risiko'] ?? '-' }}</td>
                     <td class="text-center">{{ $item->clusteringRun ? \Carbon\Carbon::parse($item->clusteringRun->created_at)->format('Y') : '-' }}</td>
                     <td class="text-center">{{ $item->clusteringRun->nama_file ?? '-' }}</td>
                     <td class="text-center">

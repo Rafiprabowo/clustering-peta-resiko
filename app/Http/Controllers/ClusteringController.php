@@ -41,10 +41,8 @@ public function downloadPdf($id)
     $petaCleaneds = PetaCleaned::with(['cluster.interpretasi', 'preprocessing'])
         ->where('peta_cleaneds.id_clustering_run', $clusteringRun->id)
         ->join('cluster_petas', 'peta_cleaneds.id', '=', 'cluster_petas.id_peta_cleaned')
-        ->orderBy('cluster_petas.cluster', 'asc') // Ganti 'nama_cluster' dengan kolom di cluster_petas
+        ->orderBy('cluster_petas.cluster', 'asc')
         ->get(['peta_cleaneds.*']);
-
-
 
     // Pie Chart 1: Total Kegiatan per Cluster
     $totalPerCluster = $petaCleaneds->groupBy('cluster.cluster')
@@ -80,21 +78,20 @@ public function downloadPdf($id)
         ],
     ]));
 
-    // Pie Chart 2: Total IKU per Cluster
     $ikuCluster = $petaCleaneds->groupBy(fn($item) => $item->cluster !== null ? $item->cluster->cluster : 'no_cluster')
         ->map(function ($group, $key) {
             $first = $group->first();
             $clusterId = $key === 'no_cluster' ? '-' : $key;
 
-            $ikus = $group->flatMap(function ($item) {
-                if (!$item->iku) return collect([]);
-                return collect(explode(',', $item->iku))->map(fn($v) => trim($v))->filter()->unique();
-            })->unique();
+            $totalIku = $group->sum(function ($item) {
+                if (!$item->iku) return 0;
+                return count(array_filter(array_map('trim', explode(',', $item->iku))));
+            });
 
             return [
                 'cluster' => $clusterId,
                 'interpretasi' => $clusterId === '-' ? '-' : optional($first->cluster->interpretasi)->interpretasi ?? '-',
-                'total_iku' => $ikus->count(),
+                'total_iku' => $totalIku,
             ];
         })->values()->toArray();
 
@@ -139,8 +136,9 @@ public function downloadPdf($id)
         ]);
 
     $filename = 'Hasil_Clustering_' . $clusteringRun->nama_file . '.pdf';
-    return $pdf->stream($filename);
+    return $pdf->download($filename);
 }
+
 
     public function destroy($id)
 {

@@ -100,11 +100,11 @@
     <table width="100%" style="text-align: center; margin-top: 20px; border-collapse: collapse;">
     <tr>
         <td style="border: 1px solid #ccc; padding: 10px;">
-            <h4>Distribusi Jumlah Kegiatan berdasarkan Cluster</h4>
+            <h2>Distribusi Jumlah Kegiatan berdasarkan Cluster</h2>
             <img src="{{ $kegiatanChartUrl }}" alt="Chart Cluster" style="width: 500px;">
         </td>
         <td style="border: 1px solid #ccc; padding: 10px;">
-            <h4>Total IKU berdasarkan Cluster</h4>
+            <h2>Total IKU berdasarkan Cluster</h2>
             <img src="{{ $ikuChartUrl }}" alt="Chart Total IKU" style="width: 500px;">
         </td>
     </tr>

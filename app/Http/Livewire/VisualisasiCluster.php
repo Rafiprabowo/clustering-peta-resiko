@@ -14,6 +14,7 @@ class VisualisasiCluster extends Component
     public $unitKerjaList = [];
     public $rekapCluster = [];
     public $ikuCluster = [];
+    public $clusterStats = [];
 
     public function mount()
     {
@@ -56,41 +57,35 @@ class VisualisasiCluster extends Component
 
         $cleaneds = $query->get();
 
-        $this->rekapCluster = $cleaneds->groupBy(fn($item) => $item->cluster !== null ? $item->cluster->cluster : 'no_cluster')
-            ->map(function ($group, $key) {
-                $first = $group->first();
-                $clusterId = $key === 'no_cluster' ? '-' : $key;
-                return [
-                    'cluster' => $clusterId,
-                    'interpretasi' => $clusterId === '-' ? '-' : optional($first->cluster->interpretasi)->interpretasi ?? '-',
-                    'total_kegiatan' => $group->count(),
-                ];
-            })
-            ->values()
-            ->toArray();
+        $this->rekapCluster = $cleaneds->groupBy(fn($item) => $item->cluster?->cluster ?? 'no_cluster')
+            ->map(fn($group, $key) => [
+                'cluster' => $key,
+                'interpretasi' => optional($group->first()->cluster?->interpretasi)->interpretasi ?? '-',
+                'total_kegiatan' => $group->count(),
+            ])->values()->toArray();
 
-        $this->ikuCluster = $cleaneds->groupBy(fn($item) => $item->cluster !== null ? $item->cluster->cluster : 'no_cluster')
-            ->map(function ($group, $key) {
-                $first = $group->first();
-                $clusterId = $key === 'no_cluster' ? '-' : $key;
+        $this->ikuCluster = $cleaneds->groupBy(fn($item) => $item->cluster?->cluster ?? 'no_cluster')
+            ->map(fn($group, $key) => [
+                'cluster' => $key,
+                'interpretasi' => optional($group->first()->cluster?->interpretasi)->interpretasi ?? '-',
+                'total_iku' => $group->sum(function ($item) {
+                    if (!$item->iku) return 0;
+                    return count(array_filter(array_map('trim', explode(',', $item->iku))));
+                }),
+            ])->values()->toArray();
 
-                $ikus = $group->flatMap(function ($item) {
-                    if (!$item->iku) return collect([]);
-                    return collect(explode(',', $item->iku))->map(fn($v) => trim($v))->filter()->unique();
-                })->unique();
-
-                return [
-                    'cluster' => $clusterId,
-                    'interpretasi' => $clusterId === '-' ? '-' : optional($first->cluster->interpretasi)->interpretasi ?? '-',
-                    'total_iku' => $ikus->count(),
-                ];
-            })
-            ->values()
-            ->toArray();
-
+        $this->clusterStats = $cleaneds->groupBy(fn($item) => $item->cluster?->cluster ?? 'no_cluster')
+            ->map(fn($group, $key) => [
+                'cluster' => $key,
+                'interpretasi' => optional($group->first()->cluster?->interpretasi)->interpretasi ?? '-',
+                'rata_iku' => round($group->sum(fn($i) => count(array_filter(array_map('trim', explode(',', $i->iku))))) / max(1, $group->count()), 2),
+                'rata_anggaran' => round($group->avg('nilRabUsulan'), 2),
+                'rata_risiko' => round($group->avg(fn($i) => optional($i->preprocessing)->normalisasi['tingkat_risiko'] ?? 0), 2),
+            ])->values()->toArray();
 
         $this->dispatchBrowserEvent('updateClusterChart', ['data' => $this->rekapCluster]);
         $this->dispatchBrowserEvent('updateIkuChart', ['data' => $this->ikuCluster]);
+        $this->dispatchBrowserEvent('updateClusterStatsChart', ['data' => $this->clusterStats]);
     }
 
     public function render()
