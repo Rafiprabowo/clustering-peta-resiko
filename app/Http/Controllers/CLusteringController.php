@@ -70,6 +70,7 @@ class CLusteringController extends Controller
         $clustering->total_data = $data['total_data'];
         $clustering->data_bersih = $data['data_bersih'];
         $clustering->data_dibuang = $data['data_dibuang'];
+        $clustering->score = $data['score'];
         $clustering->save();
 
 

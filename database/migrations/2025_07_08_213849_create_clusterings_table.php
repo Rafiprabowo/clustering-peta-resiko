@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('total_data');
             $table->integer('data_bersih');
             $table->integer('data_dibuang');
+            $table->float('score');
             $table->timestamps();
         });
     }

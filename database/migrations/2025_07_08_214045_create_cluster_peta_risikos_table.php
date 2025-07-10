@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('id_usulan');
             $table->string('iku')->nullable();
             $table->text('nama_kegiatan');
-            $table->unsignedBigInteger('nilai_anggaran');
+            $table->decimal('nilai_anggaran', 20);
             $table->string('nama_unit');
             $table->text('pernyataan_risiko');
             $table->text('uraian_dampak');
