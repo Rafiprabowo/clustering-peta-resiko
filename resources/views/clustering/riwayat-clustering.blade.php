@@ -19,6 +19,7 @@
                                             <th>Nama File</th>
                                             <th>Data Bersih</th>
                                             <th>Data Dibuang</th>
+                                            <th>Score</th>
                                             <th>Hapus</th>
                                         </tr>
                                     </thead>
@@ -29,6 +30,7 @@
                                                 <td class="text-center">{{ $item->nama_file }}</td>
                                                 <td class="text-center">{{ $item->data_bersih }}</td>
                                                 <td class="text-center">{{ $item->data_dibuang }}</td>
+                                                <td class="text-center">{{ $item->score }}</td>
                                                 <td class="text-center">
                                                     <form action="{{ route('clustering.delete', $item->id) }}"
                                                         method="POST"
