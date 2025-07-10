@@ -206,30 +206,50 @@
             const body = $('#modalUsulanBody');
             body.empty();
 
+            function klasifikasiRisiko(nilai) {
+                if (nilai >= 1 && nilai <= 4) return "VERY LOW";
+                else if (nilai >= 5 && nilai <= 8) return "LOW";
+                else if (nilai >= 9 && nilai <= 12) return "MIDDLE";
+                else if (nilai >= 13 && nilai <= 19) return "HIGH";
+                else if (nilai >= 20 && nilai <= 25) return "VERY HIGH";
+                else return "Tidak Valid";
+            }
+            function formatAngka(nilai) {
+                return new Intl.NumberFormat('id-ID').format(nilai);
+            }
+
+
             if (data.length > 0) {
                 const table = $(`
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>ID Usulan</th>
-                        <th>IKU</th>
-                        <th>Nama Kegiatan</th>
-                        <th>Nama Unit</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        `);
+                <table class="table table-bordered table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>ID Usulan</th>
+                            <th>Nama Unit</th>
+                            <th>Nama Kegiatan</th>
+                            <th>Nilai Anggaran</th>
+                            <th>Skor Dampak</th>
+                            <th>Skor Probabilitas</th>
+                            <th>Tingkat Risiko</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            `);
+
 
                 data.forEach((item, index) => {
                     table.find('tbody').append(`
                 <tr>
                     <td>${index + 1}</td>
                     <td>${item.id_usulan}</td>
-                    <td>${item.iku}</td>
-                    <td>${item.nama_kegiatan}</td>
                     <td>${item.nama_unit}</td>
+                    <td>${item.nama_kegiatan}</td>
+                    <td>${formatAngka(item.nilai_anggaran)}</td>
+                    <td>${item.dampak_angka}</td>
+                    <td>${item.probabilitas_angka}</td>
+                    <td>${item.tingkat_risiko} (${klasifikasiRisiko(item.tingkat_risiko)})</td>
                 </tr>
             `);
                 });

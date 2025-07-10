@@ -59,6 +59,10 @@ class DashboardPetaRisiko extends Component
                 'iku' => $item->iku,
                 'nama_kegiatan' => $item->nama_kegiatan,
                 'nama_unit' => $item->nama_unit,
+                'nilai_anggaran' => $item->nilai_anggaran,
+                'dampak_angka' => $item->dampak_angka,
+                'probabilitas_angka' => $item->probabilitas_angka,
+                'tingkat_risiko' => $item->tingkat_risiko,
             ])
             ->values()
             ->toArray();
