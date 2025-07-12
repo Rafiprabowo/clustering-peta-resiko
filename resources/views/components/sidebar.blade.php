@@ -6,57 +6,58 @@
         <div class="sidebar-brand sidebar-brand-sm">
             <a href="#">SPI</a>
         </div>
+
         <ul class="sidebar-menu">
 
             @foreach ($merged_menus as $item)
                 @if ($item instanceof \App\Models\Menu)
-                    <li class="{{ Request::is(ltrim($item->link, '/')) ? 'active' : '' }}">
-                        <a href="{{ $item->link }}" class="nav-link">
+                    {{-- Menu tanpa head --}}
+                    @php
+                        $currentLink = trim($item->link, '/');
+                        $isMenuActive = request()->is($currentLink) || request()->is($currentLink . '/*');
+
+                        // Deteksi apakah nama menu mengandung "Manual Book"
+                        $isManualBook = str_contains($item->name, 'Manual Book');
+                        $isKuisioner = str_contains($item->name, 'Link Kuisioner');
+                    @endphp
+
+                    <li class="{{ $isMenuActive ? 'active' : '' }}">
+                        <a href="{{ $item->link }}" class="nav-link {{ $isManualBook || $isKuisioner ? 'small-font' : '' }}">
                             <i class="nav-icon {{ $item->icon }}"></i>
                             <span>{{ $item->name }}</span>
                         </a>
                     </li>
                 @else
-                    {{-- Head menu --}}
+                    {{-- Head Menu (dropdown) --}}
                     @php
-                        $count = 0;
-                        foreach ($item->Menu as $menu) {
-                            if ($menu->Level_menu->pluck('id_level')->contains(auth()->user()->id_level)) {
-                                $count++;
-                            }
-                        }
+                        // Deteksi apakah salah satu submenu aktif
+                        $isParentActive = $item->Menu->contains(function ($menu) {
+                            $link = trim($menu->link, '/');
+                            return request()->is($link) || request()->is($link . '/*');
+                        });
                     @endphp
 
-                    @if ($count > 0)
-                        @php
-                            $isActiveParent = false;
-                            foreach ($item->Menu as $menu) {
-                                $pattern = ltrim($menu->link, '/');
-                                if (Request::is($pattern) || Request::is($pattern . '/*')) {
-                                    $isActiveParent = true;
-                                    break;
-                                }
-                            }
-                        @endphp
-                        <li class="nav-item dropdown {{ $isActiveParent ? 'active' : '' }}">
-                            <a href="#" class="nav-link has-dropdown" data-toggle="dropdown">
-                                <i class="nav-icon {{ $item->icon }}"></i>
-                                <span>{{ $item->name }}</span>
-                            </a>
-                            <ul class="dropdown-menu {{ $isActiveParent ? 'show' : '' }}">
-                                @foreach ($item->Menu as $menu)
-                                    @if ($menu->Level_menu->pluck('id_level')->contains(auth()->user()->id_level))
-                                        <li class="{{ Request::is(ltrim($menu->link, '/')) ? 'active' : '' }}">
-                                            <a href="{{ $menu->link }}" class="nav-link">
-                                                <i class="{{ $menu->icon }}"></i>
-                                                <span>{{ $menu->name }}</span>
-                                            </a>
-                                        </li>
-                                    @endif
-                                @endforeach
-                            </ul>
-                        </li>
-                    @endif
+                    <li class="nav-item dropdown {{ $isParentActive ? 'active' : '' }}">
+                        <a href="#" class="nav-link has-dropdown toggle-submenu">
+                            <i class="nav-icon {{ $item->icon }}"></i>
+                            <span>{{ $item->name }}</span>
+                        </a>
+                        <ul class="dropdown-menu {{ $isParentActive ? 'show' : '' }}">
+                            @foreach ($item->Menu as $menu)
+                                @php
+                                    $isSubActive =
+                                        request()->is(trim($menu->link, '/')) ||
+                                        request()->is(trim($menu->link, '/') . '/*');
+                                @endphp
+                                <li class="{{ $isSubActive ? 'active' : '' }}">
+                                    <a href="{{ $menu->link }}" class="nav-link">
+                                        <i class="{{ $menu->icon }}"></i>
+                                        <span>{{ $menu->name }}</span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </li>
                 @endif
             @endforeach
 
@@ -66,7 +67,31 @@
                     <span>Logout</span>
                 </a>
             </li>
-        </ul>
 
+        </ul>
     </aside>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.toggle-submenu').forEach(function(toggle) {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                const parent = this.closest('.nav-item.dropdown');
+                const menu = parent.querySelector('.dropdown-menu');
+
+                // Tutup semua dropdown lain
+                document.querySelectorAll('.dropdown-menu').forEach(el => {
+                    if (el !== menu) el.classList.remove('show');
+                });
+                document.querySelectorAll('.nav-item.dropdown').forEach(el => {
+                    if (el !== parent) el.classList.remove('active');
+                });
+
+                // Toggle yang ini
+                menu.classList.toggle('show');
+                parent.classList.toggle('active');
+            });
+        });
+    });
+</script>

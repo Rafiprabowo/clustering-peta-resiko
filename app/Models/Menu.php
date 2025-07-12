@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Menu extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'link', 'icon', 'id_head_menu'];
+    protected $guarded = [];
 
     public function Level_menu()
     {

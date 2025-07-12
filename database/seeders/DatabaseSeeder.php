@@ -6,6 +6,7 @@ use App\Models\Head_menu;
 use App\Models\Menu;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use PhpOffice\PhpWord\Writer\HTML\Part\Head;
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,30 +21,7 @@ class DatabaseSeeder extends Seeder
         Head_menu::create([
             'name' => 'Peta Risiko',
             'icon' => 'fas fa-map', // Ganti jadi icon peta
-        ]);
-
-        Menu::create([
-            'id' => 20,
-            'name' => 'Clustering',
-            'link' => '/clustering-peta-risiko',
-            'icon' => 'fas fa-diagram-project', // Representasi proses clustering
-            'id_head_menu' => 1,
-        ]);
-
-        Menu::create([
-            'id' => 21,
-            'name' => 'Riwayat Clustering',
-            'link' => '/riwayat-clustering',
-            'icon' => 'fas fa-clock-rotate-left', // Representasi riwayat / history
-            'id_head_menu' => 1,
-        ]);
-
-        Menu::create([
-            'id' => 22,
-            'name' => 'Hasil Cluster',
-            'link' => '/hasil-cluster',
-            'icon' => 'fas fa-layer-group', // Representasi hasil kelompok/cluster
-            'id_head_menu' => 1,
+            'order' => 5,
         ]);
 
         Menu::create([
@@ -52,8 +30,8 @@ class DatabaseSeeder extends Seeder
             'link' => '/analisis-peta-risiko',
             'icon' => 'fas fa-chart-line', // Representasi analisis risiko
             'id_head_menu' => 1,
+            'order' => 1,
         ]);
-
 
         Menu::create([
             'id' => 24,
@@ -61,7 +39,45 @@ class DatabaseSeeder extends Seeder
             'link' => '/petas',
             'icon' => 'fas fa-table', // Ganti jadi icon data/table
             'id_head_menu' => 1,
+            'order' => 2,
         ]);
+
+        Head_menu::create([
+            'name' => 'Clustering',
+            'icon' => 'fas fa-diagram-project',
+            'order' => 6,
+        ]);
+
+
+        Menu::create([
+            'id' => 20,
+            'name' => 'Unggah Dataset',
+            'link' => '/dataset',
+            'icon' => 'fas fa-file-upload',
+            'id_head_menu' => 2,
+            'order' => 1,
+        ]);
+
+          Menu::create([
+            'id' => 21,
+            'name' => 'Proses Clustering',
+            'link' => '/proses',
+            'icon' => 'fas fa-gears',
+            'id_head_menu' => 2,
+            'order' => 2,
+
+        ]);
+
+        Menu::create([
+            'id' => 22,
+            'name' => 'Riwayat Clustering',
+            'link' => '/riwayat',
+            'icon' => 'fas fa-clock-rotate-left', // Representasi riwayat / history
+            'id_head_menu' => 2,
+            'order' => 3,
+
+        ]);
+
 
         $this->call(MenuData::class);
         $this->call(LevelSeeder::class);

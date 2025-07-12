@@ -20,6 +20,7 @@
                                             <th>Data Bersih</th>
                                             <th>Data Dibuang</th>
                                             <th>Score</th>
+                                            <th>Waktu</th>
                                             <th>Hapus</th>
                                         </tr>
                                     </thead>
@@ -31,6 +32,8 @@
                                                 <td class="text-center">{{ $item->data_bersih }}</td>
                                                 <td class="text-center">{{ $item->data_dibuang }}</td>
                                                 <td class="text-center">{{ $item->score }}</td>
+                                                <td class="text-center">{{ $item->created_at }}</td>
+
                                                 <td class="text-center">
                                                     <form action="{{ route('clustering.delete', $item->id) }}"
                                                         method="POST"
@@ -46,9 +49,9 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="5" class="text-center">
+                                                <td colspan="7" class="text-center">
                                                     <div class="alert alert-danger m-0">
-                                                        Data Clustering Peta Risiko belum Tersedia
+                                                           Data Riwayat Clustering belum Tersedia
                                                     </div>
                                                 </td>
                                             </tr>

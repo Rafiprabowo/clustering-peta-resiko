@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Head_menu extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'icon'];
+    protected $guarded = [];
 
     public function Menu()
     {

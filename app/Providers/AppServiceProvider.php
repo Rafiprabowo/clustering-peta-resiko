@@ -26,74 +26,57 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
+
     public function boot()
-    {
-        // View::composer('*', function($view)
-        // {
+{
+    View::composer('*', function ($view) {
+        View::share('user', auth()->user());
 
-        //     View::share('user', auth()->user());
+        if (auth()->check()) {
+            $level_menus = Level_menu::where('id_level', auth()->user()->id_level)->get();
+            $allowed_menu_ids = $level_menus->pluck('id_menu')->toArray();
 
-        //     if(auth()->check()){
-        //         $level_menus = Level_menu::where('id_level', auth()->user()->id_level)->get();
-        //         $first = Menu::first();
-        //         $menus = Menu::get();
-        //         // $panel_menus[] = null;
-        //         foreach($menus as $menu){
-        //             foreach ($level_menus->skip(1) as $level_menu) {
-        //                 if ($menu->id == $level_menu->id_menu) {
-        //                     if($menu->id_head_menu == null){
-        //                         $panel_menus[] = $menu;
-        //                     }
-        //                 }
-        //             }
-        //         };
+            // Menu tanpa head
+            $panel_menus = Menu::whereNull('id_head_menu')
+                ->whereIn('id', $allowed_menu_ids)
+                ->orderBy('order')
+                ->get()
+                ->map(function ($menu) {
+                    $menu->menu_type = 'single';
+                    $menu->global_order = $menu->order ?? 999;
+                    return $menu;
+                });
 
-        //         $head_menus = Head_menu::get();
+            // Menu dalam Head_menu
+            $head_menus = Head_menu::with(['Menu' => function ($query) use ($allowed_menu_ids) {
+                $query->whereIn('id', $allowed_menu_ids)
+                      ->orderBy('order')
+                      ->with('Level_menu');
+            }])->orderBy('order')->get();
 
-        //         View::share([
-        //             'first_menu' =>$first,
-        //             'panel_menus' =>$panel_menus,
-        //             'head_menus' =>$head_menus,
-        //             'level_menus' => $level_menus
-        //         ]);
-        //     }
+            // Filter dan beri tipe
+            $head_menus = $head_menus->filter(function ($head_menu) {
+                return $head_menu->Menu->count() > 0;
+            })->map(function ($head_menu) {
+                $head_menu->menu_type = 'head';
+                $head_menu->global_order = $head_menu->order ?? 999;
+                return $head_menu;
+            });
 
+            $merged_menus = $panel_menus
+                ->concat($head_menus)
+                ->sortBy('global_order')
+                ->values();
 
-        // });
-
-
-                View::composer('*', function($view) {
-    View::share('user', auth()->user());
-
-    if(auth()->check()) {
-        $level_menus = Level_menu::where('id_level', auth()->user()->id_level)->get();
-        $first = Menu::first();
-
-        // Ambil menu sesuai level
-        $menus = Menu::with('Level_menu')->get();
-        $panel_menus = collect();
-        foreach($menus as $menu) {
-            if ($menu->id_head_menu == null) {
-                $allowed = $menu->Level_menu->pluck('id_level')->contains(auth()->user()->id_level);
-                if ($allowed) $panel_menus->push($menu);
-            }
+            View::share([
+                'first_menu' => Menu::first(),
+                'panel_menus' => $panel_menus,
+                'head_menus' => $head_menus,
+                'level_menus' => $level_menus,
+                'merged_menus' => $merged_menus,
+            ]);
         }
+    });
+}
 
-        $head_menus = Head_menu::with(['Menu.Level_menu'])->get();
-
-        // Urutkan: panel sampai RTM, lalu head menu, lalu sisanya
-        $merged_menus = collect();
-
-        $merged_menus = $merged_menus->concat($panel_menus->where('id', '<=', 4));
-        $merged_menus = $merged_menus->concat($head_menus);
-        $merged_menus = $merged_menus->concat($panel_menus->where('id', '>', 4));
-
-        View::share([
-            'first_menu' => $first,
-            'merged_menus' => $merged_menus,
-        ]);
-    }
-});
-
-    }
 }

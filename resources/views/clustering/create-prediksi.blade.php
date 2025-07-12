@@ -15,7 +15,7 @@
                         <div class="card border-0 shadow rounded">
                             <div class="card-body">
 
-                                <form action="{{ route('clustering.proses') }}" method="POST"
+                                <form action="{{ route('clustering.store') }}" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
 

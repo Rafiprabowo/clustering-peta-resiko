@@ -10,33 +10,12 @@ use Illuminate\Support\Facades\Http;
 
 class CLusteringController extends Controller
 {
-
-
-    public function destroy($id)
-    {
-        $riwayat = Clustering::find($id);
-        if (!$riwayat) {
-            return back()
-                ->with('error', 'Data clustering tidak ditemukan.');
-        }
-
-        $riwayat->delete();
-
-        return back()
-            ->with('success', 'Data clustering berhasil dihapus!');
+    //create clustering
+    public function create(){
+        return view('clustering.create-prediksi');
     }
-
-
-    public function riwayat(){
-        $riwayats = Clustering::paginate(10);
-        return view('clustering.riwayat-clustering', compact('riwayats'));
-    }
-
-    public function hasilCluster(){
-        return view('clustering.hasil-cluster');
-    }
-
-    public function proses(Request $request){
+    //store clustering
+    public function store(Request $request){
 
          // 1. Validasi file
         $request->validate([
@@ -130,4 +109,30 @@ class CLusteringController extends Controller
         return back()->with('success', 'Data berhasil diproses dan disimpan.');
 
     }
+
+
+    public function destroy($id)
+    {
+        $riwayat = Clustering::find($id);
+        if (!$riwayat) {
+            return back()
+                ->with('error', 'Data clustering tidak ditemukan.');
+        }
+
+        $riwayat->delete();
+
+        return back()
+            ->with('success', 'Data clustering berhasil dihapus!');
+    }
+
+    public function riwayat(){
+        $riwayats = Clustering::paginate(10);
+        return view('clustering.riwayat-clustering', compact('riwayats'));
+    }
+
+    public function hasilCluster(){
+        return view('clustering.hasil-cluster');
+    }
+
+
 }

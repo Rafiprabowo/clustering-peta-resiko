@@ -246,6 +246,14 @@ class LevelMenuSeeder extends Seeder
                 'id_level' => '1',
                 'id_menu' => '24',
             ],
+             [
+                'id_level' => '1',
+                'id_menu' => '28',
+            ],
+             [
+                'id_level' => '1',
+                'id_menu' => '29',
+            ],
 
             [
                 'id_level' => '2',
@@ -271,24 +279,39 @@ class LevelMenuSeeder extends Seeder
                 'id_level' => '2',
                 'id_menu' => '24',
             ],
+            [
+                'id_level' => '2',
+                'id_menu' => '24',
+            ],
+
+             [
+                'id_level' => '2',
+                'id_menu' => '28',
+            ],
+             [
+                'id_level' => '2',
+                'id_menu' => '29',
+            ],
 
             //Anggota SPI
+
+              [
+                'id_level' => '3',
+                'id_menu' => '23',
+            ],
+              [
+                'id_level' => '3',
+                'id_menu' => '24',
+            ],
+              [
+                'id_level' => '3',
+                'id_menu' => '28',
+            ],
              [
                 'id_level' => '3',
-                'id_menu' => '22',
+                'id_menu' => '29',
             ],
-              [
-                'id_level' => '3',
-                'id_menu' => '23',
-            ],
-              [
-                'id_level' => '3',
-                'id_menu' => '24',
-            ],
-              [
-                'id_level' => '4',
-                'id_menu' => '22',
-            ],
+
               [
                 'id_level' => '4',
                 'id_menu' => '23',
@@ -297,10 +320,16 @@ class LevelMenuSeeder extends Seeder
                 'id_level' => '4',
                 'id_menu' => '24',
             ],
+
               [
-                'id_level' => '6',
-                'id_menu' => '22',
+                'id_level' => '4',
+                'id_menu' => '28',
             ],
+             [
+                'id_level' => '4',
+                'id_menu' => '29',
+            ],
+
               [
                 'id_level' => '6',
                 'id_menu' => '23',
@@ -308,6 +337,15 @@ class LevelMenuSeeder extends Seeder
               [
                 'id_level' => '6',
                 'id_menu' => '24',
+            ],
+
+              [
+                'id_level' => '6',
+                'id_menu' => '28',
+            ],
+             [
+                'id_level' => '6',
+                'id_menu' => '29',
             ],
 
         ];

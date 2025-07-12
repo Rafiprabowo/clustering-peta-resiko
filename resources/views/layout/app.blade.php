@@ -21,6 +21,14 @@
     <!-- Template CSS -->
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/components.css') }}">
+    <style>
+        .nav-link.small-font span {
+            font-size: 14px;
+            line-height: 1.2;
+            white-space: normal;
+            /* Boleh turun ke baris kedua */
+        }
+    </style>
 </head>
 
 <body>

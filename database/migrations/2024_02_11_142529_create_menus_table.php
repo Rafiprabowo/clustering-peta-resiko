@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('link');
             $table->string('icon');
+            $table->integer('order');
             // $table->enum('admin', [0,1])->default('0');
             // $table->enum('ketua', [0,1])->default('0');
             // $table->enum('anggota', [0,1])->default('0');
