@@ -21,3 +21,10 @@ Route::get('/proses', [CLusteringController::class, 'proses'])->name('clustering
 Route::get('/riwayat', [CLusteringController::class, 'riwayat'])->name('clustering.riwayat')->middleware('auth');
 Route::delete('/riwayat/{id}', [CLusteringController::class, 'destroy'])->name('clustering.delete')->middleware('auth');
 
+Route::get('/kuisioner', function (){
+    return view('clustering.kuisioner');
+});
+
+Route::get('/manual-book', function (){
+    return view('clustering.manualBook');
+});
