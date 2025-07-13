@@ -128,7 +128,7 @@
                                             </a>
 
                                                <a href="{{ route('petas.exportPdfidentifikasiRisiko', ['tahun' => $selectedYear]) }}" class="btn btn-outline-primary mb-1">
-                                                <i class="fas fa-file"></i> Download File Pdf & Excel
+                                                <i class="fas fa-file"></i> Export per Unit Kerja
                                             </a>
                                         @endif
                                     </div>
