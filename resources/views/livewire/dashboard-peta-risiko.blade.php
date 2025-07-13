@@ -8,15 +8,27 @@
     </style>
 @endpush
 
-
 <div>
 
 
-    <div class="row align-items-end mb-3">
+    <div class="row align-items-end">
+
+        {{-- Filter Tahun --}}
+        <div class="col-md-4">
+            <label for="tahunTerpilih">Filter Tahun:</label>
+            <select class="form-control" wire:model="tahunTerpilih" id="tahunTerpilih">
+                <option value="">-- Semua Tahun --</option>
+                @foreach ($daftarTahun as $tahun)
+                    <option value="{{ $tahun }}">{{ $tahun }}</option>
+                @endforeach
+            </select>
+        </div>
+
         {{-- Filter Clustering --}}
-        <div class="col-md-6">
-            <label for="clustering">Pilih File Clustering:</label>
-            <select class="form-control" wire:model="selectedClustering" id="clustering">
+        <div class="col-md-4">
+            <label for="clustering">Pilih File Peta Risiko:</label>
+            <select class="form-control" wire:model="selectedClustering" id="clustering"
+                {{ !$tahunTerpilih ? 'disabled' : '' }}>
                 <option value="">-- Pilih File --</option>
                 @foreach ($clusteringList as $id => $nama)
                     <option value="{{ $id }}">{{ $nama }}</option>
@@ -24,14 +36,18 @@
             </select>
         </div>
 
-        {{-- Tombol Export --}}
-        <div class="col-md-6 text-right">
-            @if ($selectedClustering)
-                <button wire:click="exportPdf" class="btn btn-danger mt-4">
-                    <i class="fas fa-file-pdf"></i> Export PDF
-                </button>
-            @endif
-        </div>
+
+
+        @if ($tahunTerpilih && $selectedClustering)
+            {{-- Tombol Export --}}
+            <div class="col text-right justify-content-center">
+                @if ($selectedClustering)
+                    <button wire:click="exportPdf" class="btn btn-danger mt-4">
+                        <i class="fas fa-file-pdf"></i> Export PDF
+                    </button>
+                @endif
+            </div>
+        @endif
     </div>
 
 
@@ -62,7 +78,6 @@
                 </div>
             @endif
         </div>
-
 
         {{-- Centroid Bar Chart --}}
         {{-- <div class="row">
@@ -168,8 +183,8 @@
             </div>
         </div>
     @else
-        <div class="alert ">
-            Silakan pilih file clustering untuk menampilkan data.
+        <div class="text-start mt-3">
+            <em>Silakan pilih Tahun dan File Peta Risiko terlebih dahulu.</em>
         </div>
     @endif
 </div>
@@ -214,6 +229,7 @@
                 else if (nilai >= 20 && nilai <= 25) return "VERY HIGH";
                 else return "Tidak Valid";
             }
+
             function formatAngka(nilai) {
                 return new Intl.NumberFormat('id-ID').format(nilai);
             }
@@ -246,9 +262,9 @@
                     <td>${item.id_usulan}</td>
                     <td>${item.nama_unit}</td>
                     <td>${item.nama_kegiatan}</td>
-                    <td>${formatAngka(item.nilai_anggaran)}</td>
-                    <td>${item.dampak_angka}</td>
-                    <td>${item.probabilitas_angka}</td>
+                    <td>${formatAngka(item.nil_rab_usulan)}</td>
+                    <td>${item.dampak_numerik}</td>
+                    <td>${item.probabilitas_numerik}</td>
                     <td>${item.tingkat_risiko} (${klasifikasiRisiko(item.tingkat_risiko)})</td>
                 </tr>
             `);

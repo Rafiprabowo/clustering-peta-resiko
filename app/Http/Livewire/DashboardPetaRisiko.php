@@ -18,13 +18,40 @@ class DashboardPetaRisiko extends Component
     public $ikuPerCluster = [];
     public $selectedClustering = null;
     public $clusteringList = [];
+    public $tahunTerpilih = null;
+    public $daftarTahun = [];
+
 
     protected $listeners = ['bukaModal'];
 
     public function mount()
     {
-        $this->clusteringList = Clustering::pluck('nama_file', 'id')->toArray();
+        // Ambil semua tahun dari created_at
+        $this->daftarTahun = Clustering::selectRaw('YEAR(created_at) as tahun')
+            ->distinct()
+            ->orderByDesc('tahun')
+            ->pluck('tahun')
+            ->toArray();
     }
+
+    public function updatedTahunTerpilih()
+    {
+        if ($this->tahunTerpilih) {
+            $this->clusteringList = Clustering::whereYear('created_at', $this->tahunTerpilih)
+                ->pluck('nama_file', 'id')
+                ->toArray();
+
+            // Reset selected clustering jika tahun berubah
+            $this->selectedClustering = null;
+            $this->resetCharts();
+        } else {
+            $this->clusteringList = [];
+            $this->selectedClustering = null;
+            $this->resetCharts();
+        }
+    }
+
+
 
     public function updatedSelectedClustering()
     {
@@ -59,9 +86,9 @@ class DashboardPetaRisiko extends Component
                 'iku' => $item->iku,
                 'nama_kegiatan' => $item->nama_kegiatan,
                 'nama_unit' => $item->nama_unit,
-                'nilai_anggaran' => $item->nilai_anggaran,
-                'dampak_angka' => $item->dampak_angka,
-                'probabilitas_angka' => $item->probabilitas_angka,
+                'nil_rab_usulan' => $item->nil_rab_usulan,
+                'dampak_numerik' => $item->dampak_numerik,
+                'probabilitas_numerik' => $item->probabilitas_numerik,
                 'tingkat_risiko' => $item->tingkat_risiko,
             ])
             ->values()
@@ -151,9 +178,9 @@ class DashboardPetaRisiko extends Component
     {
         $centroids = Centroid::where('id_clustering', $this->selectedClustering)->orderBy('cluster')->get();
         $features = [
-            'nilai_iku' => 'Nilai IKU',
-            'nilai_anggaran' => 'Nilai Anggaran',
-            'tingkat_risiko' => 'Tingkat Risiko'
+            'c_iku' => 'Nilai IKU',
+            'c_nil_rab_usulan' => 'Nilai Anggaran',
+            'c_tingkat_risiko' => 'Tingkat Risiko'
         ];
 
         foreach ($features as $field => $label) {
@@ -194,13 +221,13 @@ class DashboardPetaRisiko extends Component
                 'cluster' => $clusterId,
                 'min_iku' => $ikuCounts->min(),
                 'max_iku' => $ikuCounts->max(),
-                'avg_iku' => round($ikuCounts->avg(), 2),
-                'min_anggaran' => $items->min('nilai_anggaran'),
-                'max_anggaran' => $items->max('nilai_anggaran'),
-                'avg_anggaran' => round($items->avg('nilai_anggaran'), 2),
+                'avg_iku' => round($ikuCounts->avg()),
+                'min_anggaran' => $items->min('nil_rab_usulan'),
+                'max_anggaran' => $items->max('nil_rab_usulan'),
+                'avg_anggaran' => round($items->avg('nil_rab_usulan')),
                 'min_risiko' => $items->min('tingkat_risiko'),
                 'max_risiko' => $items->max('tingkat_risiko'),
-                'avg_risiko' => round($items->avg('tingkat_risiko'), 2),
+                'avg_risiko' => round($items->avg('tingkat_risiko')),
             ];
         })->values()->toArray();
     }

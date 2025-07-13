@@ -60,37 +60,36 @@ class CLusteringController extends Controller
             $peta->id_usulan = $item['idUsulan'] ?? '-';
             $peta->iku = $item['iku'] ?? '-';
             $peta->nama_kegiatan= $item['nmKegiatan'] ?? '-';
-            $peta->nilai_anggaran= $item['nilRabUsulan'] ?? '-';
+            $peta->nil_rab_usulan= $item['nilRabUsulan'] ?? 0;
             $peta->nama_unit= $item['nmUnit'] ?? '-';
             $peta->pernyataan_risiko= $item['pernyataanRisiko'] ?? '-';
             $peta->uraian_dampak= $item['uraianDampak'] ?? '-';
             $peta->pengendalian= $item['pengendalian'] ?? '-';
             $peta->kategori_risiko= $item['Resiko'] ?? '-';
 
-            $peta->dampak= $item['dampak'] ?? '-';
+            $peta->dampak= $item['dampak'] ?? 0;
 
-            $peta->probabilitas= $item['probaBilitas'] ?? '-';
-            $peta->status_telaah= $item['statusTelaah'] ?? '-';
-            $peta->telaah_teknis = $item['telaahTeknis'] ?? '-';
-            $peta->telaah_spi = $item['telaahSpi'] ?? '-';
+            $peta->probabilitas= $item['probaBilitas'] ?? 0;
+            $peta->status_telaah= $item['statusTelaah'] ?? 0;
+            $peta->telaah_teknis = $item['telaahTeknis'] ?? 0;
+            $peta->telaah_spi = $item['telaahSpi'] ?? 0;
             $peta->rekomendasi_substansi = $item['rekomendasiSubstansi'] ?? '-';
             $peta->rekomendasi_teknis = $item['rekomendasiTeknis'] ?? '-';
             $peta->rekomendasi_spi = $item['rekomendasiSpi'] ?? '-';
             $peta->rekomendasi = $item['rekomendasi'] ?? '-';
             $peta->kesesuaian_pk_direktur = $item['kesesuaianPkDirektur'] ?? '-';
             $peta->is_sesuai_pk_direktur= $item['isSesuaiPkDirektur'] ?? '-';
+            $peta->tingkat_risiko= $item['tingkat_risiko'] ?? 0;
 
+            // transform
+            $peta->dampak_numerik= $item['dampak_numerik'] ?? 0;
+            $peta->probabilitas_numerik= $item['probabilitas_numerik'] ?? 0;
+            $peta->iku_numerik= $item['iku_numerik'] ?? 0;
 
-
-            // $peta->iku_angka= $item['iku_angka'] ;
-            $peta->dampak_angka= $item['dampak_angka'] ?? '-';
-            $peta->probabilitas_angka= $item['probaBilitas_angka'] ?? '-';
-            $peta->iku_angka= $item['iku_angka'] ?? '-';
-
-            $peta->tingkat_risiko= $item['tingkat_risiko'] ?? '-';
-            $peta->nilai_iku = $item['nilai_iku'] ?? 0;
-            $peta->nilai_anggaran_scaled = $item['nilRabUsulan_scaled'] ?? 0;
-            $peta->tingkat_risiko_scaled = $item['tingkat_risiko_scaled'] ?? 0;
+            //normalisasi
+            $peta->normal_iku_numerik = $item['normal_iku_numerik'] ?? 0;
+            $peta->normal_nil_rab_usulan = $item['normal_nilRabUsulan'] ?? 0;
+            $peta->normal_tingkat_risiko = $item['normal_tingkat_risiko'] ?? 0;
             $peta->cluster = $item['cluster'] ?? null;
             $peta->save();
         }
@@ -100,9 +99,9 @@ class CLusteringController extends Controller
             $cluster = new Centroid();
             $cluster->id_clustering = $clustering->id;
             $cluster->cluster = $c['cluster'];
-            $cluster->nilai_iku = $c['nilai_iku'];
-            $cluster->nilai_anggaran = $c['nilai_anggaran'];
-            $cluster->tingkat_risiko = $c['tingkat_risiko'];
+            $cluster->c_iku = $c['c_iku'];
+            $cluster->c_nil_rab_usulan = $c['c_nilRabUsulan'];
+            $cluster->c_tingkat_risiko = $c['c_tingkat_risiko'];
             $cluster->save();
         }
 
@@ -133,6 +132,19 @@ class CLusteringController extends Controller
     public function hasilCluster(){
         return view('clustering.hasil-cluster');
     }
+
+    public function proses()
+    {
+        return view('clustering.proses-clustering');
+    }
+
+
+
+
+
+
+
+
 
 
 }

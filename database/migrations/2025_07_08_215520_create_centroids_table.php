@@ -17,9 +17,9 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_clustering');
             $table->integer('cluster');
-            $table->float('nilai_iku');
-            $table->decimal('nilai_anggaran', 20);
-            $table->float('tingkat_risiko');
+            $table->float('c_iku');
+            $table->float('c_nil_rab_usulan');
+            $table->float('c_tingkat_risiko');
             $table->timestamps();
         });
     }

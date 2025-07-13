@@ -28,6 +28,8 @@
             white-space: normal;
             /* Boleh turun ke baris kedua */
         }
+
+
     </style>
 </head>
 
@@ -55,6 +57,7 @@
     <!-- Your other scripts -->
     <script src="{{ asset('js/stisla.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
 
     @stack('scripts')
 

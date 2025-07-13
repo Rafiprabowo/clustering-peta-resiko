@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('id_usulan');
             $table->string('iku')->nullable();
             $table->text('nama_kegiatan');
-            $table->decimal('nilai_anggaran', 20);
+            $table->decimal('nil_rab_usulan', 20);
             $table->string('nama_unit');
             $table->text('pernyataan_risiko');
             $table->text('uraian_dampak');
@@ -37,13 +37,15 @@ return new class extends Migration
             $table->text('rekomendasi')->nullable();
             $table->text('kesesuaian_pk_direktur')->nullable();
             $table->integer('is_sesuai_pk_direktur');
-            $table->integer('iku_angka')->nullable();
-            $table->integer('dampak_angka');
-            $table->integer('probabilitas_angka');
+            //transform
+            $table->integer('dampak_numerik');
+            $table->integer('probabilitas_numerik');
+            $table->integer('iku_numerik')->nullable();
             $table->integer('tingkat_risiko');
-            $table->integer('nilai_iku');
-            $table->integer('nilai_anggaran_scaled');
-            $table->integer('tingkat_risiko_scaled');
+            //normalisasi
+            $table->float('normal_iku_numerik');
+            $table->float('normal_nil_rab_usulan');
+            $table->float('normal_tingkat_risiko');
             $table->integer('cluster');
 
             $table->timestamps();

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AnalisisPetaRisikoController;
 use App\Http\Controllers\CLusteringController;
+use App\Http\Controllers\ProsesClusteringController;
 use App\Models\Clustering;
 use Illuminate\Support\Facades\Route;
 
@@ -13,8 +14,10 @@ Route::get('/analisis-peta-risiko', [AnalisisPetaRisikoController::class, 'index
 Route::get('/dataset', [CLusteringController::class, 'create'])->name('clustering.create')->middleware('auth');
 Route::post('/dataset', [CLusteringController::class, 'store'])->name('clustering.store')->middleware('auth');
 // proses-clustering
-// riwayat-clustering
+Route::get('/proses', [CLusteringController::class, 'proses'])->name('clustering.proses')->middleware('auth');
 
+
+// riwayat-clustering
 Route::get('/riwayat', [CLusteringController::class, 'riwayat'])->name('clustering.riwayat')->middleware('auth');
 Route::delete('/riwayat/{id}', [CLusteringController::class, 'destroy'])->name('clustering.delete')->middleware('auth');
 
