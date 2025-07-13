@@ -94,7 +94,7 @@
                             <tbody>
                                 @forelse ($items as $i => $item)
                                     <tr>
-                                        <td class="align-top">{{ $i + 1 }}</td>
+                                        <td class="align-top">{{ $items->firstItem() + $i }}</td>
                                         <td class="align-top text-wrap">{{ $item->nama_unit }}</td>
                                         <td class="align-top text-wrap">{{ $item->id_usulan }}</td>
                                         <td class="align-top text-wrap highlight-kolom">{{ $item->iku }}</td>
@@ -150,7 +150,7 @@
                         </div>
                     </div>
                 @else
-                     <div class="text-start mt-3">
+                    <div class="text-start mt-3">
                         <em>Silakan pilih Tahun dan File Peta Risiko terlebih dahulu.</em>
                     </div>
                 @endif
@@ -181,7 +181,7 @@
                             <tbody>
                                 @forelse ($items as $i => $item)
                                     <tr>
-                                        <td class="align-top">{{ $i + 1 }}</td>
+                                        <td class="align-top">{{ $items->firstItem() + $i }}</td>
                                         <td class="align-top text-wrap">{{ $item->nama_unit }}</td>
                                         <td class="align-top text-wrap">{{ $item->id_usulan }}</td>
                                         <td class="align-top text-wrap highlight-kolom">{{ $item->iku_numerik }}</td>
@@ -229,7 +229,7 @@
                         </div>
                     </div>
                 @else
-                     <div class="text-start mt-3">
+                    <div class="text-start mt-3">
                         <em>Silakan pilih Tahun dan File Peta Risiko terlebih dahulu.</em>
                     </div>
                 @endif
@@ -260,7 +260,7 @@
                             <tbody>
                                 @forelse ($items as $i => $item)
                                     <tr>
-                                        <td>{{ $i + 1 }}</td>
+                                        <td class="align-top">{{ $items->firstItem() + $i }}</td>
                                         <td>{{ $item->nama_unit }}</td>
                                         <td>{{ $item->id_usulan }}</td>
                                         <td class="highlight-kolom">{{ $item->normal_iku_numerik }}</td>
@@ -304,7 +304,7 @@
                         </div>
                     </div>
                 @else
-                     <div class="text-start mt-3">
+                    <div class="text-start mt-3">
                         <em>Silakan pilih Tahun dan File Peta Risiko terlebih dahulu.</em>
                     </div>
                 @endif
@@ -352,7 +352,7 @@
                                 @endphp
                                 @forelse ($items as $i => $item)
                                     <tr>
-                                        <td>{{ $i + 1 }}</td>
+                                        <td class="align-top">{{ $items->firstItem() + $i }}</td>
                                         <td>{{ $item->nama_unit }}</td>
                                         <td>{{ $item->id_usulan }}</td>
                                         <td>{{ $item->iku }}</td>

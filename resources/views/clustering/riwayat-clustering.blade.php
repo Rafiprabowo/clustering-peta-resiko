@@ -17,6 +17,7 @@
                                         <tr class="text-center">
                                             <th>No</th>
                                             <th>Nama File</th>
+                                            <th>Total Data</th>
                                             <th>Data Bersih</th>
                                             <th>Data Dibuang</th>
                                             <th>Score</th>
@@ -29,6 +30,7 @@
                                             <tr>
                                                 <td class="text-center">{{ $loop->iteration }}</td>
                                                 <td class="text-center">{{ $item->nama_file }}</td>
+                                                <td class="text-center">{{ ($item->data_bersih + $item->data_dibuang) }}</td>
                                                 <td class="text-center">{{ $item->data_bersih }}</td>
                                                 <td class="text-center">{{ $item->data_dibuang }}</td>
                                                 <td class="text-center">{{ $item->score }}</td>
