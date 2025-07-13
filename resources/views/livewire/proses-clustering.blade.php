@@ -150,7 +150,7 @@
                         </div>
                     </div>
                 @else
-                    <div class="text-center mt-3">
+                     <div class="text-start mt-3">
                         <em>Silakan pilih Tahun dan File Peta Risiko terlebih dahulu.</em>
                     </div>
                 @endif
@@ -229,7 +229,7 @@
                         </div>
                     </div>
                 @else
-                    <div class="text-center mt-3">
+                     <div class="text-start mt-3">
                         <em>Silakan pilih Tahun dan File Peta Risiko terlebih dahulu.</em>
                     </div>
                 @endif
@@ -304,7 +304,7 @@
                         </div>
                     </div>
                 @else
-                    <div class="text-center mt-3">
+                     <div class="text-start mt-3">
                         <em>Silakan pilih Tahun dan File Peta Risiko terlebih dahulu.</em>
                     </div>
                 @endif
