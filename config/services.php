@@ -30,4 +30,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'clustering_api' => [
+        'base_url' => env('API_CLUSTER_BASE_URL'),
+    ],
+
+
 ];

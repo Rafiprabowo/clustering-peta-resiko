@@ -51,7 +51,7 @@ class DatabaseSeeder extends Seeder
 
         Menu::create([
             'id' => 20,
-            'name' => 'Unggah Dataset',
+            'name' => 'Dataset',
             'link' => '/dataset',
             'icon' => 'fas fa-file-upload',
             'id_head_menu' => 2,

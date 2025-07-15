@@ -1,407 +1,127 @@
-@push('style')
-    <style>
-        .fixed-cell {
-            max-width: 250px !important;
-            height: 100px !important;
-            overflow-y: auto !important;
-            white-space: normal !important;
-            word-wrap: break-word !important;
-            display: block;
-        }
-
-        .highlight-kolom {
-            background-color: #d4edda;
-            color: #155724;
-            /* teks hijau gelap supaya kontras */
-        }
-    </style>
-@endpush
-
-
-<div>
-    <div class="card-body" x-data="{ tab: @entangle('activeTab') }">
-
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <label for="tahun">Pilih Tahun:</label>
-                <select class="form-control" wire:model="selectedYear" id="tahun">
-                    <option value="">-- Pilih Tahun --</option>
-                    @foreach ($years as $year)
-                        <option value="{{ $year }}">{{ $year }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="col-md-4">
-                <label for="clustering">Pilih File Peta Risiko:</label>
-                @if ($selectedYear)
-                    <select class="form-control" wire:model="selectedClustering" id="clustering">
-                        <option value="">-- Pilih File --</option>
-                        @foreach ($clusteringList as $id => $nama)
-                            <option value="{{ $id }}">{{ $nama }}</option>
-                        @endforeach
-                    </select>
-                @else
-                    <input type="text" class="form-control" value="Silakan pilih tahun terlebih dahulu" disabled>
-                @endif
-            </div>
+<div class="section-body">
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label>Tahun</label>
+            <select wire:model="tahunTerpilih" class="form-control">
+                <option value="">-- Pilih Tahun --</option>
+                @foreach ($tahunList as $tahun)
+                    <option value="{{ $tahun }}">{{ $tahun }}</option>
+                @endforeach
+            </select>
         </div>
 
-        <!-- TAB NAVIGATION -->
-        <ul class="nav nav-pills mb-3" role="tablist">
-            <li class="nav-item">
-                <a href="#" class="nav-link" :class="{ 'active': tab === 'cleaning' }"
-                    @click.prevent="tab = 'cleaning'">Cleaning</a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" :class="{ 'active': tab === 'transform' }"
-                    @click.prevent="tab = 'transform'">Transform</a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" :class="{ 'active': tab === 'normalisasi' }"
-                    @click.prevent="tab = 'normalisasi'">Normalisasi</a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link" :class="{ 'active': tab === 'cluster' }"
-                    @click.prevent="tab = 'cluster'">Cluster</a>
-            </li>
-        </ul>
-
-        <!-- TAB CONTENT -->
-        <div class="tab-content">
-            <!-- CLEANING -->
-            <div x-show="tab === 'cleaning'" wire:ignore.self>
-                @if ($selectedYear && $selectedClustering)
-                    <div class="table-responsive mt-3">
-                        <table class="table table-bordered table-sm">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Unit Kerja</th>
-                                    <th>ID Usulan</th>
-                                    <th class="highlight-kolom">IKU</th>
-                                    <th>Nama Kegiatan</th>
-                                    <th class="highlight-kolom">Anggaran</th>
-                                    <th>Pernyataan</th>
-                                    <th>Kategori</th>
-                                    <th>Uraian</th>
-                                    <th class="highlight-kolom">Probabilitas</th>
-                                    <th class="highlight-kolom">Dampak</th>
-                                    <th>Tingkat Risiko</th>
-                                    <th>Pengendalian</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($items as $i => $item)
-                                    <tr>
-                                        <td class="align-top">{{ $items->firstItem() + $i }}</td>
-                                        <td class="align-top text-wrap">{{ $item->nama_unit }}</td>
-                                        <td class="align-top text-wrap">{{ $item->id_usulan }}</td>
-                                        <td class="align-top text-wrap highlight-kolom">{{ $item->iku }}</td>
-
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->nama_kegiatan }}
-                                            </div>
-                                        </td>
-
-                                        <td class="align-top text-right highlight-kolom">
-                                            {{ number_format($item->nil_rab_usulan, 0, ',', '.') }}
-                                        </td>
-
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->pernyataan_risiko }}
-                                            </div>
-                                        </td>
-
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->kategori_risiko }}
-                                            </div>
-                                        </td>
-
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->uraian_dampak }}
-                                            </div>
-                                        </td>
-
-                                        <td class="align-top highlight-kolom">{{ $item->probabilitas }}</td>
-                                        <td class="align-top highlight-kolom">{{ $item->dampak }}</td>
-                                        <td class="align-top">-</td>
-
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->pengendalian }}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="13" class="text-center">Tidak ada data ditemukan.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-
-                        <div class="mt-3">
-                            {{ $items->links() }}
-                        </div>
-                    </div>
-                @else
-                    <div class="text-start mt-3">
-                        <em>Silakan pilih Tahun dan File Peta Risiko terlebih dahulu.</em>
-                    </div>
-                @endif
-            </div>
-
-            <!-- TRANSFORM -->
-            <div x-show="tab === 'transform'" wire:ignore.self>
-                @if ($selectedYear && $selectedClustering)
-                    <div class="table-responsive mt-3">
-                        <table class="table table-bordered table-sm">
-                            <thead class="thead-light">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Unit Kerja</th>
-                                    <th>ID Usulan</th>
-                                    <th class="highlight-kolom">IKU</th>
-                                    <th>Nama Kegiatan</th>
-                                    <th>Anggaran</th>
-                                    <th>Pernyataan</th>
-                                    <th>Kategori</th>
-                                    <th>Uraian</th>
-                                    <th class="highlight-kolom">Probabilitas</th>
-                                    <th class="highlight-kolom">Dampak</th>
-                                    <th>Tingkat Risiko</th>
-                                    <th>Pengendalian</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($items as $i => $item)
-                                    <tr>
-                                        <td class="align-top">{{ $items->firstItem() + $i }}</td>
-                                        <td class="align-top text-wrap">{{ $item->nama_unit }}</td>
-                                        <td class="align-top text-wrap">{{ $item->id_usulan }}</td>
-                                        <td class="align-top text-wrap highlight-kolom">{{ $item->iku_numerik }}</td>
-                                        <td class="align-top text-wrap fixed-cell">{{ $item->nama_kegiatan }}</td>
-                                        <td class="align-top text-right">
-                                            {{ number_format($item->nil_rab_usulan, 0, ',', '.') }}</td>
-
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->pernyataan_risiko }}
-                                            </div>
-                                        </td>
-
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->kategori_risiko }}
-                                            </div>
-                                        </td>
-
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->uraian_dampak }}
-                                            </div>
-                                        </td>
-
-                                        <td class="align-top highlight-kolom">{{ $item->probabilitas }}</td>
-                                        <td class="align-top highlight-kolom">{{ $item->dampak }}</td>
-                                        <td class="align-top">-</td>
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->pengendalian }}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="13" class="text-center">Tidak ada data ditemukan.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-
-                        <div class="mt-3">
-                            {{ $items->links() }}
-                        </div>
-                    </div>
-                @else
-                    <div class="text-start mt-3">
-                        <em>Silakan pilih Tahun dan File Peta Risiko terlebih dahulu.</em>
-                    </div>
-                @endif
-            </div>
-
-            <!-- NORMALISASI -->
-            <div x-show="tab === 'normalisasi'" wire:ignore.self>
-                @if ($selectedYear && $selectedClustering)
-                    <div class="table-responsive mt-3">
-                        <table class="table table-bordered table-sm">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Unit Kerja</th>
-                                    <th>ID Usulan</th>
-                                    <th class="highlight-kolom">IKU</th>
-                                    <th>Nama Kegiatan</th>
-                                    <th class="highlight-kolom">Anggaran</th>
-                                    <th>Pernyataan</th>
-                                    <th>Kategori</th>
-                                    <th>Uraian</th>
-                                    <th>Probabilitas</th>
-                                    <th>Dampak</th>
-                                    <th class="highlight-kolom">Tingkat Risiko</th>
-                                    <th>Pengendalian</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($items as $i => $item)
-                                    <tr>
-                                        <td class="align-top">{{ $items->firstItem() + $i }}</td>
-                                        <td>{{ $item->nama_unit }}</td>
-                                        <td>{{ $item->id_usulan }}</td>
-                                        <td class="highlight-kolom">{{ $item->normal_iku_numerik }}</td>
-                                        <td>{{ $item->nama_kegiatan }}</td>
-                                        <td class="highlight-kolom">{{ $item->normal_nil_rab_usulan }}</td>
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->pernyataan_risiko }}
-                                            </div>
-                                        </td>
-
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->kategori_risiko }}
-                                            </div>
-                                        </td>
-
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->uraian_dampak }}
-                                            </div>
-                                        </td>
-                                        <td>{{ $item->probabilitas_numerik }}</td>
-                                        <td>{{ $item->dampak_numerik }}</td>
-                                        <td class="highlight-kolom">{{ $item->normal_tingkat_risiko }}</td>
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->pengendalian }}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="9" class="text-center">Tidak ada data ditemukan.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                        <div class="mt-3">
-                            {{ $items->links() }}
-                        </div>
-                    </div>
-                @else
-                    <div class="text-start mt-3">
-                        <em>Silakan pilih Tahun dan File Peta Risiko terlebih dahulu.</em>
-                    </div>
-                @endif
-            </div>
-
-            <!-- CLUSTER -->
-            <div x-show="tab === 'cluster'" wire:ignore.self>
-                @if ($selectedYear && $selectedClustering)
-                    <div class="table-responsive mt-3">
-                        <table class="table table-bordered table-sm">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Unit Kerja</th>
-                                    <th>ID Usulan</th>
-                                    <th>IKU</th>
-                                    <th>Nama Kegiatan</th>
-                                    <th>Anggaran</th>
-                                    <th>Pernyataan</th>
-                                    <th>Kategori</th>
-                                    <th>Uraian</th>
-                                    <th>Probabilitas</th>
-                                    <th>Dampak</th>
-                                    <th>Tingkat Risiko</th>
-                                    <th>Pengendalian</th>
-                                    <th class="highlight-kolom">Cluster</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @php
-                                    function mapRiskLevelFromScore($score)
-                                    {
-                                        if ($score >= 21) {
-                                            return 'EXTREME';
-                                        } elseif ($score >= 16) {
-                                            return 'HIGH';
-                                        } elseif ($score >= 11) {
-                                            return 'MIDDLE';
-                                        } elseif ($score >= 6) {
-                                            return 'LOW';
-                                        } else {
-                                            return 'VERY LOW';
-                                        }
-                                    }
-                                @endphp
-                                @forelse ($items as $i => $item)
-                                    <tr>
-                                        <td class="align-top">{{ $items->firstItem() + $i }}</td>
-                                        <td>{{ $item->nama_unit }}</td>
-                                        <td>{{ $item->id_usulan }}</td>
-                                        <td>{{ $item->iku }}</td>
-                                        <td>{{ $item->nama_kegiatan }}</td>
-                                        <td>{{ number_format($item->nil_rab_usulan, 0, ',', '.') }}</td>
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->pernyataan_risiko }}
-                                            </div>
-                                        </td>
-
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->kategori_risiko }}
-                                            </div>
-                                        </td>
-
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->uraian_dampak }}
-                                            </div>
-                                        </td>
-                                        <td>{{ $item->probabilitas }}</td>
-                                        <td>{{ $item->dampak }}</td>
-                                        <td>{{ mapRiskLevelFromScore($item->tingat_risiko) }}</td>
-                                        <td class="align-top">
-                                            <div class="fixed-cell">
-                                                {{ $item->pengendalian }}
-                                            </div>
-                                        </td>
-                                        <td class="highlight-kolom">{{ $item->cluster }}</td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="9" class="text-center">Tidak ada data ditemukan.</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                        <div class="mt-3">
-                            {{ $items->links() }}
-                        </div>
-                    </div>
-                @else
-                    <div class="text-start mt-3">
-                        <em>Silakan pilih Tahun dan File Peta Risiko terlebih dahulu.</em>
-                    </div>
-                @endif
-            </div>
+        <div class="col-md-4">
+            <label>Nama File</label>
+            <select wire:model="namaFileTerpilih" class="form-control" {{ !$tahunTerpilih ? 'disabled' : '' }}>
+                <option value="">-- Pilih File --</option>
+                @foreach ($daftarFile as $file)
+                    <option value="{{ $file }}">{{ $file }}</option>
+                @endforeach
+            </select>
         </div>
     </div>
+
+    @if ($namaFileTerpilih && $dataTable->count())
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <button wire:click="prosesCleaning" class="btn btn-primary btn-sm" wire:loading.attr="disabled">
+                        <span wire:loading wire:target="prosesCleaning" class="spinner-border spinner-border-sm"></span>
+                        Cleaning
+                    </button>
+                    <button wire:click="prosesTransform" class="btn btn-success btn-sm" wire:loading.attr="disabled">
+                        <span wire:loading wire:target="prosesTransform"
+                            class="spinner-border spinner-border-sm"></span>
+                        Transform
+                    </button>
+                    <button wire:click="prosesNormalize" class="btn btn-info btn-sm" wire:loading.attr="disabled">
+                        <span wire:loading wire:target="prosesNormalize"
+                            class="spinner-border spinner-border-sm"></span>
+                        Normalize
+                    </button>
+                    <button wire:click="prosesClustering" class="btn btn-warning btn-sm" wire:loading.attr="disabled">
+                        <span wire:loading wire:target="prosesClustering"
+                            class="spinner-border spinner-border-sm"></span>
+                        Clustering
+                    </button>
+                </div>
+            </div>
+
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Unit Kerja</th>
+                        <th>ID Usulan</th>
+                        <th>Nama Program</th>
+                        <th>IKU</th>
+                        <th>Anggaran</th>
+                        <th>Dampak</th>
+                        <th>Probabilitas</th>
+                        @if ($step === 'transform' || $step === 'normalize')
+                            <th>Tingkat Risiko</th>
+                        @endif
+                        <th>Risiko</th>
+                        <th>Pernyataan Risiko</th>
+                        <th>Uraian Dampak</th>
+                        <th>Pengendalian</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($dataTable as $index => $row)
+                        <tr>
+                            <td>{{ ($dataTable->firstItem() ?? 0) + $index }}</td>
+                            <td>{{ $row->nama_unit }}</td>
+                            <td>{{ $row->id_usulan }}</td>
+                            <td>{{ $row->nama_kegiatan }}</td>
+                            <td>{{ $row->iku }}</td>
+                            <td>{{ $row->nilai_rab_usulan }}</td>
+                            <td>{{ $row->dampak }}</td>
+                            <td>{{ $row->probabilitas }}</td>
+                            @if ($step === 'transform' || $step === 'normalize')
+                                <td>{{ $row->tingkat_risiko ?? $row->dampak * $row->probabilitas }}</td>
+                            @endif
+                            <td>{{ $row->risiko }}</td>
+                            <td>{{ $row->pernyataan_risiko }}</td>
+                            <td>{{ $row->uraian_dampak }}</td>
+                            <td>{{ $row->pengendalian }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            <div class="mt-2">
+                {{ $dataTable->links() }}
+            </div>
+        </div>
+    @endif
 </div>
+
+@push('scripts')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (session('success'))
+                Toastify({
+                    text: "{{ session('success') }}",
+                    duration: 4000,
+                    gravity: "top",
+                    position: "center",
+                    backgroundColor: "#28a745",
+                    close: true,
+                    stopOnFocus: true
+                }).showToast();
+            @elseif (session('error'))
+                Toastify({
+                    text: "{{ session('error') }}",
+                    duration: 4000,
+                    gravity: "top",
+                    position: "center",
+                    backgroundColor: "#dc3545",
+                    close: true,
+                    stopOnFocus: true
+                }).showToast();
+            @endif
+        });
+    </script>
+@endpush

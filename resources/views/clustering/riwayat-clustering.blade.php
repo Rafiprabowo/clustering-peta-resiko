@@ -70,36 +70,4 @@
     </div>
 @endsection
 
-    @push('scripts')
-        <!-- Toastify -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-        <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
-        <script>
-            $(document).ready(function() {
-                @if (session('success'))
-                    Toastify({
-                        text: "{{ session('success') }}",
-                        duration: 4000,
-                        gravity: "top",
-                        position: "center",
-                        backgroundColor: "#28a745",
-                        // className: "toastify-center",
-                        close: true,
-                        stopOnFocus: true
-                    }).showToast();
-                @elseif (session('error'))
-                    Toastify({
-                        text: "{{ session('error') }}",
-                        duration: 4000,
-                        gravity: "top",
-                        position: "center",
-                        backgroundColor: "#dc3545",
-                        // className: "toastify-center",
-                        close: true,
-                        stopOnFocus: true
-                    }).showToast();
-                @endif
-            });
-        </script>
-    @endpush
+   
