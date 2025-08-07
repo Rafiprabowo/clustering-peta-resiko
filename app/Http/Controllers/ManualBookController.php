@@ -11,12 +11,13 @@ class ManualBookController extends Controller
         return view('clustering.manual-book', compact('active'));
     }
 
-    public function download(){
-        $filePath = public_path('manual/manual-book.pdf');
+  public function download()
+    {
+        $filePath = public_path('manual-book/Manual_Book_Fitur_Clustering.pdf');
 
         // Pastikan file ada
         if (file_exists($filePath)) {
-            return response()->download($filePath, 'Manual-Book.pdf', [
+            return response()->download($filePath, 'Manual_Book_Fitur_Clustering.pdf', [
                 'Content-Type' => 'application/pdf',
             ]);
         }
@@ -24,4 +25,5 @@ class ManualBookController extends Controller
         // Jika file tidak ditemukan
         abort(404, 'Manual book tidak ditemukan.');
     }
+
 }
