@@ -38,7 +38,7 @@ class StepNormalisasi extends Component
     $payload = $collection->toArray();
 
     try {
-        $response = Http::post('http://127.0.0.1:5000/normalisasi', [
+        $response = Http::post('http://fastapi:8001/normalisasi', [
             'data' => $payload
         ]);
 

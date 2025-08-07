@@ -171,7 +171,7 @@ class StepCleaning extends Component
 {
     $rows = DataMentahClustering::where('proses_clustering_id', $this->prosesClusteringId)->get();
 
-    $response = Http::post('http://localhost:5000/cleaning', $rows->toArray());
+    $response = Http::post('http://fastapi:8001/cleaning', $rows->toArray());
 
     if ($response->successful()) {
         $cleaned = $response->json();

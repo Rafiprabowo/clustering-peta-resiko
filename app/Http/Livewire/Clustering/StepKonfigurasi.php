@@ -68,7 +68,7 @@ class StepKonfigurasi extends Component
         ];
 
         try {
-            $response = Http::timeout(30)->post('http://127.0.0.1:5000/clustering', $payload);
+            $response = Http::timeout(30)->post('http://fastapi:8001/clustering', $payload);
             if ($response->failed()) {
                 throw new \Exception("Gagal menghubungi server Python: {$response->status()}");
             }
