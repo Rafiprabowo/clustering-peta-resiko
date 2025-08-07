@@ -36,35 +36,35 @@
 
     </div>
 
-  @if (!empty($jumlahPerCluster))
-    <div class="mt-4">
-        <h5 class="text-center mb-3">Karakteristik Klaster</h5>
-        <table class="table table-bordered table-striped">
-            <thead class="text-center">
-                <tr>
-                    <th>Klaster</th>
-                    <th>Rata-rata nilai IKU</th>
-                    <th>Rata-rata nilai RAB usulan</th>
-                    <th>Rata-rata tingkat risiko</th>
-                    <th>Jumlah Data</th>
-                    <th>Interpretasi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($jumlahPerCluster as $item)
-                    <tr class="text-center">
-                        <td>{{ $item['cluster'] }}</td>
-                        <td>{{ $item['rata_iku'] }}</td>
-                        <td>Rp{{ number_format($item['rata_rab'], 0, ',', '.') }}</td>
-                        <td>{{ $item['rata_risiko'] }}</td>
-                        <td>{{ $item['jumlah'] }}</td>
-                        <td>{{ $item['label'] }}</td>
+    @if (!empty($jumlahPerCluster))
+        <div class="mt-4">
+            <h5 class="text-center mb-3">Karakteristik Klaster</h5>
+            <table class="table table-bordered table-striped">
+                <thead class="text-center">
+                    <tr>
+                        <th>Klaster</th>
+                        <th>Rata-rata nilai IKU</th>
+                        <th>Rata-rata nilai RAB usulan</th>
+                        <th>Rata-rata tingkat risiko</th>
+                        <th>Jumlah Data</th>
+                        <th>Interpretasi</th>
                     </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-@endif
+                </thead>
+                <tbody>
+                    @foreach ($jumlahPerCluster as $item)
+                        <tr class="text-center">
+                            <td>{{ $item['cluster'] }}</td>
+                            <td>{{ $item['rata_iku'] }}</td>
+                            <td>Rp{{ number_format($item['rata_rab'], 0, ',', '.') }}</td>
+                            <td>{{ $item['rata_risiko'] }}</td>
+                            <td>{{ $item['jumlah'] }}</td>
+                            <td>{{ $item['label'] }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    @endif
 
 
 
@@ -76,7 +76,6 @@
                 <thead class="text-center">
                     <tr>
                         <th>Klaster</th>
-                        <th>Label</th>
                         <th>IKU</th>
                     </tr>
                 </thead>
@@ -84,11 +83,8 @@
                     @foreach ($uniqueIkuPerCluster as $item)
                         <tr>
                             <td class="text-center">{{ $item['cluster'] }}</td>
-                            <td class="text-center">{{ $item['label'] }}</td>
                             <td>
-                                @foreach ($item['ikus'] as $iku)
-                                    <span class="badge bg-primary text-white me-1">{{ $iku }}</span>
-                                @endforeach
+                                {{ implode(', ', $item['ikus']) }}
                             </td>
                         </tr>
                     @endforeach

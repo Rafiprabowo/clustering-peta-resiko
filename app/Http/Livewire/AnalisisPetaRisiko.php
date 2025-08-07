@@ -123,10 +123,6 @@ class AnalisisPetaRisiko extends Component
             ->values()
             ->toArray();
 
-
-
-
-
         }
     }
 
