@@ -13,7 +13,7 @@
                 @if ($sudahDisimpan) disabled @endif>
 
                 <span wire:loading.remove wire:target="simpanHasilClustering">
-                    <i class="fas fa-save me-1"></i> Simpan Hasil Clustering
+                    <i class="fas fa-save me-1"></i>
                 </span>
 
                 <span wire:loading wire:target="simpanHasilClustering">
@@ -39,7 +39,7 @@
         'rgba(255, 159, 64, 0.7)',
         'rgba(0, 0, 0, 0.7)'
     ];
-    
+
     function groupByLabel(data, xKey, yKey) {
         const grouped = {};
         data.forEach(item => {
@@ -53,7 +53,7 @@
         });
         return grouped;
     }
-    
+
     function buildChart(canvasId, xKey, yKey, xLabel, yLabel, xMax = null, yMax = null, xMin = null, yMin = null) {
         const grouped = groupByLabel(rawData, xKey, yKey);
         const datasets = Object.keys(grouped).map((label, idx) => ({
@@ -64,20 +64,20 @@
             parsing: false,
             showLine: false
         }));
-    
+
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
-    
+
         const scalesConfig = {
             x: { title: { display: true, text: xLabel } },
             y: { title: { display: true, text: yLabel } }
         };
-    
+
         if (xMin !== null) scalesConfig.x.min = xMin;
         if (xMax !== null) scalesConfig.x.max = xMax;
         if (yMin !== null) scalesConfig.y.min = yMin;
         if (yMax !== null) scalesConfig.y.max = yMax;
-    
+
         new Chart(canvas.getContext('2d'), {
             type: 'scatter',
             data: { datasets },
@@ -99,7 +99,7 @@
             }
         });
     }
-    
+
     buildChart('plotIkuVsRab', 'iku', 'nilai_rab_usulan', 'Indikator Kinerja Utama (IKU)', 'Nilai Anggaran', null, 100000000);
     buildChart('plotIkuVsRisiko', 'iku', 'skor_risiko', 'Indikator Kinerja Utama (IKU)', 'Tingkat Risiko');
     buildChart('plotRabVsRisiko', 'nilai_rab_usulan', 'skor_risiko', 'Nilai Anggaran', 'Tingkat Risiko', 100000000);">

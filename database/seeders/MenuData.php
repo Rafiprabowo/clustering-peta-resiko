@@ -109,10 +109,17 @@ class MenuData extends Seeder
                 'icon' => 'fas fa-paste',
             ],
 
-            [
+            // [
+            //     'id' => 22,
+            //     'name' => 'Manual Book',
+            //     'link' => '/manual-book',
+            //     'icon' => 'fas fa-book-open',
+            // ],
+
+             [
                 'id' => 22,
-                'name' => 'Manual Book',
-                'link' => '/manual-book',
+                'name' => 'Panduan Pengguna',
+                'link' => '/panduan-pengguna',
                 'icon' => 'fas fa-book-open',
             ],
             [

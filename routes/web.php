@@ -29,6 +29,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ValidasiController;
 use App\Http\Controllers\RTMController;
 use App\Http\Controllers\ImportedExcelController;
+use App\Http\Controllers\KuisionerController;
+use App\Http\Controllers\ManualBookController;
 use App\Http\Controllers\ProsesClusteringController;
 use App\Http\Controllers\RiwayatClusteringController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -52,6 +54,10 @@ Route::get('/analisis', [AnalisisPetaRisikoController::class, 'index'])->middlew
 
 Route::get('/clustering/export-pdf/{prosesClusteringId}', [ExportHasilClusteringController::class, 'exportPdf'])
     ->name('clustering.export.pdf');
+
+Route::get('/panduan-pengguna', [ManualBookController::class, 'index'])->name('penduan-pengguna');
+Route::get('/panduan-pengguna/pdf', [ManualBookController::class, 'download'])->name('download.panduan-pengguna');
+Route::get('/kuisioner', [KuisionerController::class, 'index'])->name('kuisioner');
 
 //Route Login
 //Route::get('login',     [LoginController::class, 'index'])->name('login');
