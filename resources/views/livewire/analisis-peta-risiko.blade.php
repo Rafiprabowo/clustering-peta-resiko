@@ -83,7 +83,11 @@
                     @foreach ($uniqueIkuPerCluster as $item)
                         <tr>
                             <td class="text-center">{{ $item['cluster'] }}</td>
-                            <td>{{ $item['ikus']->join(', ') }}</td>
+                            <td>
+                                @foreach ($item['ikus'] as $loopIndex => $iku)
+                                    <span>{{ $iku }}</span>{{ !$loop->last ? ',' : '' }}
+                                @endforeach
+                            </td>
                         </tr>
                     @endforeach
 
@@ -164,7 +168,7 @@
     {{-- Scatter Plot Visualisasi --}}
     <div x-data x-init="const rawData = {{ Js::from($scatterData) }};
     console.log('Data Loaded:', rawData);
-    
+
     const colors = [
         'rgba(255, 99, 132, 0.7)',
         'rgba(54, 162, 235, 0.7)',
@@ -174,7 +178,7 @@
         'rgba(255, 159, 64, 0.7)',
         'rgba(0, 0, 0, 0.7)'
     ];
-    
+
     function groupByLabel(data, xKey, yKey) {
         const grouped = {};
         data.forEach(item => {
@@ -188,7 +192,7 @@
         });
         return grouped;
     }
-    
+
     function buildChart(canvasId, xKey, yKey, xLabel, yLabel, xMax = null, yMax = null, xMin = null, yMin = null) {
         const grouped = groupByLabel(rawData, xKey, yKey);
         const datasets = Object.keys(grouped).map((label, idx) => ({
@@ -199,20 +203,20 @@
             parsing: false,
             showLine: false
         }));
-    
+
         const canvas = document.getElementById(canvasId);
         if (!canvas) return;
-    
+
         const scalesConfig = {
             x: { title: { display: true, text: xLabel } },
             y: { title: { display: true, text: yLabel } }
         };
-    
+
         if (xMin !== null) scalesConfig.x.min = xMin;
         if (xMax !== null) scalesConfig.x.max = xMax;
         if (yMin !== null) scalesConfig.y.min = yMin;
         if (yMax !== null) scalesConfig.y.max = yMax;
-    
+
         new Chart(canvas.getContext('2d'), {
             type: 'scatter',
             data: { datasets },
@@ -232,7 +236,7 @@
             }
         });
     }
-    
+
     // Jalankan 3 visualisasi
     buildChart('plotIkuVsRab', 'iku', 'nilai_rab_usulan', 'Indikator Kinerja Utama (IKU)', 'Nilai Anggaran (Rp)', null, 100000000);
     buildChart('plotIkuVsRisiko', 'iku', 'skor_risiko', 'Indikator Kinerja Utama (IKU)', 'Tingkat Risiko');
