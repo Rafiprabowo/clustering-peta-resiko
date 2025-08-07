@@ -24,6 +24,12 @@ class StepClustering extends Component
     public $algoritma = 'kmeans'; // atau 'dbscan', 'hierarchical'
     public $epsilon; // hanya untuk DBSCAN
 
+    protected $listeners = ['lanjutKeVisualisasi' => 'goToStepVisualisasi'];
+
+    public function goToStepVisualisasi()
+    {
+          $this->emitUp('clusteringCompleted', $this->prosesClusteringId);
+    }
 
     public function mount($prosesClusteringId)
     {
@@ -32,16 +38,16 @@ class StepClustering extends Component
         $this->hasilSudahDisimpan = ProsesClustering::findOrFail($prosesClusteringId)->is_saved;
     }
 
-    public function simpanHasilClustering()
-    {
-        $proses = ProsesClustering::findOrFail($this->prosesClusteringId);
-        $proses->is_saved = true;
-        $proses->save();
+    // public function simpanHasilClustering()
+    // {
+    //     $proses = ProsesClustering::findOrFail($this->prosesClusteringId);
+    //     $proses->is_saved = true;
+    //     $proses->save();
 
-        $this->hasilSudahDisimpan = true;
+    //     $this->hasilSudahDisimpan = true;
 
-        session()->flash('message', 'Hasil clustering berhasil disimpan.');
-    }
+    //     session()->flash('message', 'Hasil clustering berhasil disimpan.');
+    // }
 
     public function clustering()
     {
@@ -158,8 +164,5 @@ class StepClustering extends Component
         return view('livewire.clustering.step-clustering');
     }
 
-    public function lanjut()
-    {
-        $this->emitUp('clusteringCompleted', $this->prosesClusteringId);
-    }
+
 }

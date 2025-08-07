@@ -71,25 +71,23 @@ class StepNormalisasi extends Component
 
 public function render()
 {
-    $normalizedExists = DataNormalizedClustering::where('proses_clustering_id', $this->prosesClusteringId)->exists();
-    $this->isNormalized = $normalizedExists;
+    $this->isNormalized = DataNormalizedClustering::where('proses_clustering_id', $this->prosesClusteringId)->exists();
+
+    $dataBefore = DataTransformedClustering::where('proses_clustering_id', $this->prosesClusteringId)
+        ->select('iku', 'nilai_rab_usulan', 'skor_risiko')
+        ->orderBy('id')
+        ->paginate(10);
+
+    $dataAfter = collect();
 
     if ($this->isNormalized) {
-        // Tampilkan hasil normalisasi
-        $data = DataNormalizedClustering::where('proses_clustering_id', $this->prosesClusteringId)
-            ->orderBy('id')
-            ->paginate(10);
-    } else {
-        // Tampilkan data sebelum normalisasi
-        $data = DataTransformedClustering::where('proses_clustering_id', $this->prosesClusteringId)
-            ->select('iku', 'nilai_rab_usulan', 'skor_risiko')
+        $dataAfter = DataNormalizedClustering::where('proses_clustering_id', $this->prosesClusteringId)
             ->orderBy('id')
             ->paginate(10);
     }
 
-    return view('livewire.clustering.step-normalisasi', compact('data'));
+    return view('livewire.clustering.step-normalisasi', compact('dataBefore', 'dataAfter'));
 }
-
 
     public function lanjut()
     {

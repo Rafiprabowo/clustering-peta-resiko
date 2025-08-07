@@ -51,68 +51,73 @@ class StepCleaning extends Component
         return DataCleanedClustering::where('proses_clustering_id', $this->prosesClusteringId)->paginate(10);
     }
 
-    public function render()
-    {
-        $fields = ['iku', 'nilai_rab_usulan', 'dampak', 'probabilitas'];
-        $query = DataMentahClustering::where('proses_clustering_id', $this->prosesClusteringId);
+  public function render()
+{
+    $fields = ['iku', 'nilai_rab_usulan', 'dampak', 'probabilitas'];
+    $query = DataMentahClustering::where('proses_clustering_id', $this->prosesClusteringId);
 
+    $totalData = $query->count();
 
-        if ($this->filterDampak !== '') {
-            $query->where('dampak', $this->filterDampak);
-        }
-        $totalData = $query->count();
-        $data = $query
-            ->orderByRaw("CASE WHEN iku IS NULL OR iku = '' THEN 0 ELSE 1 END")
-            ->orderByRaw("CASE WHEN nilai_rab_usulan IS NULL OR nilai_rab_usulan = '' THEN 0 ELSE 1 END")
-            ->orderByRaw("CASE WHEN dampak IS NULL OR dampak = '' THEN 0 ELSE 1 END")
-            ->orderByRaw("CASE WHEN probabilitas IS NULL OR probabilitas = '' THEN 0 ELSE 1 END")
-            ->paginate(10);
+    $data = $query
+        ->orderByRaw("CASE WHEN iku IS NULL OR iku = '' THEN 0 ELSE 1 END")
+        ->orderByRaw("CASE WHEN nilai_rab_usulan IS NULL OR nilai_rab_usulan = '' OR nilai_rab_usulan = 0 THEN 0 ELSE 1 END")
+        ->orderByRaw("CASE WHEN dampak IS NULL OR dampak = '' THEN 0 ELSE 1 END")
+        ->orderByRaw("CASE WHEN probabilitas IS NULL OR probabilitas = '' THEN 0 ELSE 1 END")
+        ->paginate(10);
 
+    $missingCounts = [];
 
-          $missingCounts = [];
-            foreach ($fields as $field) {
-                $missingCounts[$field] = DataMentahClustering::where('proses_clustering_id', $this->prosesClusteringId)
-                    ->where(function ($q) use ($field) {
-                        $q->whereNull($field)->orWhere($field, '');
-                    })
-                    ->count();
-            }
+    foreach ($fields as $field) {
+        $missingCounts[$field] = DataMentahClustering::where('proses_clustering_id', $this->prosesClusteringId)
+            ->where(function ($q) use ($field) {
+                $q->whereNull($field)->orWhere($field, '');
 
-            $duplicateCount = DataMentahClustering::select('nama_kegiatan')
-                ->where('proses_clustering_id', $this->prosesClusteringId)
-                ->groupBy('nama_kegiatan')
-                ->havingRaw('COUNT(*) > 1')
-                ->count();
-
-
-
-
-           return view('livewire.clustering.step-cleaning', [
-                'data' => $data,
-                'cleanedData' => $this->sudahDibersihkan ? $this->cleanedData : null,
-                'missingCounts' => $missingCounts,
-                'duplicateCount' => $duplicateCount,
-                'totalData' => $totalData,
-                'isDataBersih' => $this->isDataBersih(),
-
-            ]);
-
+                // Tambahan khusus untuk nilai_rab_usulan = 0
+                if ($field === 'nilai_rab_usulan') {
+                    $q->orWhere($field, 0);
+                }
+            })
+            ->count();
     }
+
+    $duplicateCount = DataMentahClustering::select('nama_kegiatan')
+        ->where('proses_clustering_id', $this->prosesClusteringId)
+        ->groupBy('nama_kegiatan')
+        ->havingRaw('COUNT(*) > 1')
+        ->count();
+
+    return view('livewire.clustering.step-cleaning', [
+        'data' => $data,
+        'cleanedData' => $this->sudahDibersihkan ? $this->cleanedData : null,
+        'missingCounts' => $missingCounts,
+        'duplicateCount' => $duplicateCount,
+        'totalData' => $totalData,
+        'isDataBersih' => $this->isDataBersih(),
+    ]);
+}
+
 
     public function isDataBersih()
 {
-    $fields = ['iku', 'nilai_rab_usulan', 'dampak', 'probabilitas'];
+   $fields = ['iku', 'nilai_rab_usulan', 'dampak', 'probabilitas'];
 
     foreach ($fields as $field) {
-        $count = DataMentahClustering::where('proses_clustering_id', $this->prosesClusteringId)
+        $query = DataMentahClustering::where('proses_clustering_id', $this->prosesClusteringId)
             ->where(function ($q) use ($field) {
-                $q->whereNull($field)->orWhere($field, '');
-            })->count();
+                $q->whereNull($field)
+                ->orWhere($field, '');
 
-        if ($count > 0) {
+                // Tambahan khusus untuk nilai_rab_usulan
+                if ($field === 'nilai_rab_usulan') {
+                    $q->orWhere($field, 0);
+                }
+            });
+
+        if ($query->count() > 0) {
             return false;
         }
     }
+
 
     // Cek duplikat
     $duplicateCount = DataMentahClustering::select('nama_kegiatan')
@@ -201,39 +206,6 @@ class StepCleaning extends Component
         session()->flash('error', 'Gagal membersihkan data di server Python.');
     }
 }
-
-
-
-    public function cekDataTidakValid()
-    {
-        $fields = ['iku', 'nilai_rab_usulan', 'dampak', 'probabilitas'];
-        $rows = DataMentahClustering::where('proses_clustering_id', $this->prosesClusteringId)->get();
-        $this->invalidRows = [];
-
-        foreach ($rows as $row) {
-            foreach ($fields as $field) {
-                if (is_null($row->$field) || trim($row->$field) === '') {
-                    $this->invalidRows[] = $row->id;
-                    break;
-                }
-            }
-        }
-
-        DataMentahClustering::whereIn('id', $this->invalidRows)->delete();
-        $count = count($this->invalidRows);
-        $this->invalidRows = [];
-
-        session()->flash('message', "$count baris tidak valid dihapus.");
-    }
-
-    public function hapusDataTidakValid()
-    {
-        $count = count($this->invalidRows);
-        DataMentahClustering::whereIn('id', $this->invalidRows)->delete();
-        $this->invalidRows = [];
-
-        session()->flash('message', "$count baris tidak valid dihapus.");
-    }
 
   public function lanjut()
 {

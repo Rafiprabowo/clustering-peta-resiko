@@ -11,18 +11,22 @@ class StepTransformasi extends Component
 {
     use WithPagination;
 
-    // Livewire butuh nama khusus jika bukan komponen root
     protected $paginationTheme = 'bootstrap';
-
     protected $updatesQueryString = ['page'];
 
     public $prosesClusteringId;
-    public $availableFeatures = ['iku', 'nilai_rab_usulan', 'dampak', 'probabilitas'];
-    public $selectedFeatures;
 
     public function mount($prosesClusteringId)
     {
         $this->prosesClusteringId = $prosesClusteringId;
+    }
+
+    public function render()
+    {
+        $cleanedData = DataCleanedClustering::where('proses_clustering_id', $this->prosesClusteringId)->paginate(10);
+        $transformedData = DataTransformedClustering::where('proses_clustering_id', $this->prosesClusteringId)->paginate(10);
+
+        return view('livewire.clustering.step-transformasi', compact('cleanedData', 'transformedData'));
     }
 
     public function transform()
@@ -54,30 +58,18 @@ class StepTransformasi extends Component
             $transformed = new DataTransformedClustering();
             $transformed->proses_clustering_id = $this->prosesClusteringId;
             $transformed->data_cleaned_id = $row->id;
-
-            // Transformasi langsung semua fitur penting
             $transformed->iku = $this->hitungNilaiIkuIkt($row->iku);
             $transformed->nilai_rab_usulan = $row->nilai_rab_usulan;
             $transformed->dampak = $dampakMap[strtolower($row->dampak)] ?? null;
             $transformed->probabilitas = $probabilitasMap[strtolower($row->probabilitas)] ?? null;
             $transformed->skor_risiko = $transformed->dampak * $transformed->probabilitas;
-
             $transformed->save();
         }
 
         session()->flash('message', 'Transformasi semua fitur berhasil.');
+        $this->resetPage();
         $this->emitUp('transformCompleted', $this->prosesClusteringId);
     }
-
-
-    public function render()
-    {
-        $transformedData = DataTransformedClustering::where('proses_clustering_id', $this->prosesClusteringId)
-            ->paginate(10);
-
-        return view('livewire.clustering.step-transformasi', compact('transformedData'));
-    }
-
 
     public function hitungNilaiIkuIkt($isi)
     {
@@ -102,8 +94,8 @@ class StepTransformasi extends Component
         return intval(($jumlah_iku * 0.7) + ($jumlah_ikt * 0.3));
     }
 
-    public function lanjut(){
+    public function lanjut()
+    {
         $this->emitUp('dataTransformed', $this->prosesClusteringId);
     }
-
 }

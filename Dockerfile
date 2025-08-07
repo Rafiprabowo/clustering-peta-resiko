@@ -1,26 +1,23 @@
-FROM php:8.2-apache
+FROM php:8.2-fpm
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
-    git unzip zip curl libzip-dev libpng-dev libonig-dev libxml2-dev \
-    && docker-php-ext-install pdo pdo_mysql zip
-
-# Enable Apache rewrite module
-RUN a2enmod rewrite
-
-# Copy Laravel files
-WORKDIR /var/www/html
-COPY . .
-
-# Set file permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+    build-essential \
+    libpng-dev \
+    libjpeg-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip unzip curl \
+    git \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Install Laravel dependencies
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+WORKDIR /var/www
 
-# Expose Apache port
-EXPOSE 80
+COPY . .
+
+RUN composer install
+
+CMD ["php-fpm"]

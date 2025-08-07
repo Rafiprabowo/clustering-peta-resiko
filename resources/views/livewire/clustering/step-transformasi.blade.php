@@ -1,8 +1,20 @@
 <div>
+    <style>
+        .table-fixed {
+            table-layout: fixed;
+            width: 100%;
+        }
 
+        .table-fixed th,
+        .table-fixed td {
+            word-wrap: break-word;
+        }
+    </style>
+
+    {{-- Notifikasi --}}
     @if (session()->has('message'))
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 toastr.options = {
                     "closeButton": true,
                     "progressBar": true,
@@ -13,61 +25,198 @@
         </script>
     @endif
 
-    {{-- Jika Belum Ditranformasi --}}
-    @if (!$transformedData->count())
-        <p>Fitur yang akan ditransformasikan:</p>
-        <ul>
-            <li><strong>IKU</strong></li>
-            <li><strong>Dampak</strong></li>
-            <li><strong>Probabilitas</strong></li>
-        </ul>
+    {{-- Fitur yang Akan Ditransformasi --}}
+    {{-- Skala Konversi IKU --}}
+    <strong>Klasifikasi Atribut IKU dan Bobot Penilaian</strong>
+    <table class="table table-bordered mt-2 table-fixed">
+        <thead>
+            <tr>
+                <th>Kategori Indikator</th>
+                <th>Bobot</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Indikator Kinerja Utama (IKU)</td>
+                <td>0.7</td>
+            </tr>
+            <tr>
+                <td>Indikator Kinerja Tambahan (IKT)</td>
+                <td>0.3</td>
+            </tr>
+        </tbody>
+    </table>
 
-        <button wire:click="transform" class="btn btn-primary mt-2">
-            Jalankan Transformasi
+    {{-- Skala Konversi Dampak --}}
+    <strong>Skala Konversi Nilai Dampak</strong>
+    <table class="table table-bordered mt-2 table-fixed">
+        <thead>
+            <tr>
+                <th>Nilai Kategorikal</th>
+                <th>Nilai Numerik</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Sangat Berpengaruh</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>Berpengaruh</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td>Cukup Berpengaruh</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>Sedikit Berpengaruh</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>Sangat Sedikit Berpengaruh</td>
+                <td>1</td>
+            </tr>
+        </tbody>
+    </table>
+
+    {{-- Skala Konversi Probabilitas --}}
+    <strong>Skala Konversi Nilai Probabilitas</strong>
+    <table class="table table-bordered mt-2 table-fixed">
+        <thead>
+            <tr>
+                <th>Nilai Kategorikal</th>
+                <th>Nilai Numerik</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Sangat Sering</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>Sering</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td>Kadang-kadang</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>Jarang</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>Sangat Jarang</td>
+                <td>1</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+    <hr>
+
+    <strong>Fitur Baru:</strong>
+    <table class="table table-bordered mt-2">
+        <thead>
+            <tr>
+                <th>Nama Kolom</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Tingkat Risiko</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    {{-- Tabel Data Sebelum Transformasi --}}
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <h6 class="mb-0">Data Sebelum Transformasi</h6>
+        <button wire:click="transform" wire:loading.attr="disabled" wire:target="transform" class="btn btn-primary">
+            <span wire:loading.remove wire:target="transform">Transformasi</span>
+            <span wire:loading wire:target="transform">
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                Memproses...
+            </span>
         </button>
-    @endif
+    </div>
 
-    {{-- Jika Sudah Ditranformasi --}}
-    @if ($transformedData->count())
-        <h6>Data Hasil Transformasi</h6>
-        <table class="table table-bordered mt-2">
+
+    @if ($cleanedData->count())
+        <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>No</th>
+                    <th>ID Usulan</th>
+                    <th>Nama Kegiatan</th>
                     <th>IKU</th>
-                    <th>Nilai RAB Usulan</th>
                     <th>Dampak</th>
                     <th>Probabilitas</th>
-                    <th>Tingkat Risiko</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($transformedData as $index => $item)
+                @foreach ($cleanedData as $index => $row)
                     <tr>
-                        <td>{{ $transformedData->firstItem() + $index }}</td>
-                        <td>{{ $item->iku }}</td>
-                        <td>{{ number_format($item->nilai_rab_usulan, 0, ',', '.') }}</td>
-                        <td>{{ $item->dampak }}</td>
-                        <td>{{ $item->probabilitas }}</td>
-                        <td>{{ $item->skor_risiko }}</td>
+                        <td>{{ $cleanedData->firstItem() + $index }}</td>
+                        <td>{{ $row->id_usulan }}</td>
+                        <td>{{ $row->nama_kegiatan ?? '-' }}</td>
+                        <td>{{ $row->iku }}</td>
+                        <td>{{ $row->dampak }}</td>
+                        <td>{{ $row->probabilitas }}</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
 
-        {{ $transformedData->links() }}
-
-        <button wire:click="lanjut" class="btn btn-primary mt-3">Lanjut ke Pilih Fitur</button>
+        {{ $cleanedData->links() }}
+    @else
+        <p class="text-muted">Tidak ada data yang ditemukan untuk transformasi.</p>
     @endif
+
+    <hr>
+
+    {{-- Data Hasil Transformasi --}}
+    <h6>Data Hasil Transformasi</h6>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>IKU</th>
+                <th>Dampak</th>
+                <th>Probabilitas</th>
+                <th>Skor Risiko</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($transformedData as $index => $item)
+                <tr>
+                    <td>{{ $transformedData->firstItem() + $index }}</td>
+                    <td>{{ $item->iku }}</td>
+                    <td>{{ $item->dampak }}</td>
+                    <td>{{ $item->probabilitas }}</td>
+                    <td>{{ $item->skor_risiko }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    {{-- Tombol Lanjut --}}
+    @if ($transformedData->count() > 0)
+        <div class="d-flex justify-content-end">
+            <button wire:click="lanjut" class="btn btn-primary mt-3">Lanjut ke Normalisasi</button>
+        </div>
+    @endif
+
 
 </div>
 
 @push('styles')
-    <!-- Toastr CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 @endpush
 
 @push('scripts')
-    <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 @endpush

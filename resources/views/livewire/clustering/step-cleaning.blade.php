@@ -8,7 +8,9 @@
             'Sedikit Berpengaruh',
             'Sangat Sedikit Berpengaruh',
         ];
+
         $opsiProbabilitas = ['Sangat Sering', 'Sering', 'Kadang-kadang', 'Jarang', 'Sangat Jarang'];
+
         $opsiRisiko = [
             'Risiko Strategis',
             'Risiko Operasional',
@@ -65,22 +67,44 @@
         @if (!$sudahDibersihkan && isset($missingCounts))
             <div class="alert">
                 <strong>Informasi Data Hilang:</strong>
-                <ul class="mb-0">
-                    <li>IKU kosong: {{ $missingCounts['iku'] }} baris</li>
-                    <li>Nilai RAB Usulan kosong: {{ $missingCounts['nilai_rab_usulan'] }} baris</li>
-                    <li>Dampak kosong: {{ $missingCounts['dampak'] }} baris</li>
-                    <li>Probabilitas kosong: {{ $missingCounts['probabilitas'] }} baris</li>
-                    <li>Duplikat berdasarkan nama_kegiatan: {{ $duplicateCount }} nama_kegiatan</li>
-                </ul>
+                <table class="table table-bordered mt-2">
+                    <thead>
+                        <tr>
+                            <th>Nama Kolom</th>
+                            <th>Jumlah Baris</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>IKU kosong</td>
+                            <td>{{ $missingCounts['iku'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Nilai RAB Usulan kosong</td>
+                            <td>{{ $missingCounts['nilai_rab_usulan'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Dampak kosong</td>
+                            <td>{{ $missingCounts['dampak'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Probabilitas kosong</td>
+                            <td>{{ $missingCounts['probabilitas'] }}</td>
+                        </tr>
+                        <tr>
+                            <td>Duplikat berdasarkan <code>Nama Kegiatan</code></td>
+                            <td>{{ $duplicateCount }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         @endif
 
-
-        <div class="row">
-            <div class="col-md-6 ">
-                <label for="">Total Data :{{ $totalData }}</label>
+        <div class="row mb-3 align-items-center">
+            <div class="col-md-6">
+                <label class="mb-0">Total Data: {{ $totalData }}</label>
             </div>
-            <div class="col-md-6 mb-2 text-right">
+            <div class="col-md-6 d-flex justify-content-end">
                 <button wire:click="cleanData" wire:loading.attr="disabled" wire:target="cleanData"
                     class="btn btn-primary">
                     <span wire:loading.remove wire:target="cleanData">Bersihkan Data</span>
@@ -92,6 +116,7 @@
             </div>
 
         </div>
+
 
         <table class="table table-bordered table-striped">
             <thead>
@@ -193,14 +218,24 @@
                 @endforeach
             </tbody>
         </table>
+        <div class="row">
+            <div class="col d-flex align-items-center justify-content-between">
+                {{-- Kiri --}}
+                <div>
+                    {{ $data->links() }}
+                </div>
 
-        {{ $data->links() }}
+                {{-- Kanan --}}
+                @if ($isDataBersih && !$sudahDibersihkan)
+                    <div>
+                        <button wire:click="lanjut" class="btn btn-primary">
+                            Lanjut ke Transformasi
+                        </button>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+
     @endif
-
-    @if ($isDataBersih && !$sudahDibersihkan)
-        <button wire:click="lanjut" class="btn btn-primary mt-3">
-            Lanjut ke Transformasi
-        </button>
-    @endif
-
     <div />

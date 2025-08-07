@@ -41,6 +41,21 @@ class StepVisualisasi extends Component
 
     }
 
+    // StepVisualisasi.php
+    public $sudahDisimpan = false;
+
+    public function simpanHasilClustering()
+    {
+        $proses = ProsesClustering::findOrFail($this->prosesClusteringId);
+        $proses->is_saved = true;
+        $proses->save();
+
+        $this->sudahDisimpan = true;
+
+        // WAJIB: Kirim event ke browser
+        $this->dispatchBrowserEvent('clustering-saved');
+    }
+
 
     public function render()
     {

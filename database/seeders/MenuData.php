@@ -113,14 +113,15 @@ class MenuData extends Seeder
                 'id' => 22,
                 'name' => 'Manual Book',
                 'link' => '/manual-book',
-                'icon' => 'fas fa-paste',
+                'icon' => 'fas fa-book-open',
             ],
             [
                 'id' => 23,
                 'name' => 'Kuisioner',
                 'link' => '/kuisioner',
-                'icon' => 'fas fa-paste',
+                'icon' => 'fas fa-clipboard-list',
             ],
+
         ];
 
         foreach ($menu as $value) {
