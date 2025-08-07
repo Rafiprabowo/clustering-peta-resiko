@@ -8,11 +8,12 @@ services:
     restart: unless-stopped
     working_dir: /var/www
     volumes:
-      - ./app:/var/www
+      - ./:/var/www
     depends_on:
       - db
     networks:
       - laravel
+
 
   web:
     image: nginx:alpine
@@ -20,7 +21,7 @@ services:
     ports:
       - "8000:80"
     volumes:
-      - ./app:/var/www
+      - ./:/var/www
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
       - app
@@ -33,9 +34,9 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: laravel
-      MYSQL_USER: laravel
-      MYSQL_PASSWORD: secret
+      MYSQL_DATABASE: db_clustering
+      MYSQL_USER: clustering
+      MYSQL_PASSWORD: clustering
     volumes:
       - dbdata:/var/lib/mysql
     ports:
